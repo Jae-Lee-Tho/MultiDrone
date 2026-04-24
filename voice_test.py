@@ -10,7 +10,7 @@ rec = KaldiRecognizer(model, 16000, list_of_commands)
 
 last_command = None
 last_sent_time = 0
-COMMAND_COOLDOWN = 1  # ?? ?? ?? ?? ??
+COMMAND_COOLDOWN = 2  # ?? ?? ?? ?? ??
 
 def map_speech_to_command(text: str):
     text = text.lower().strip()
@@ -21,13 +21,13 @@ def map_speech_to_command(text: str):
         return "LAND"
     elif "forward" in text:
         return "FORWARD"
-    elif "backward" in text or "back" in text:
+    elif "backward" in text:
         return "BACKWARD"
     elif "left" in text:
         return "LEFT"
     elif "right" in text:
         return "RIGHT"
-    elif "stop" in text or "hover" in text:
+    elif "stop" in text:
         return "STOP"
     else:
         return None
