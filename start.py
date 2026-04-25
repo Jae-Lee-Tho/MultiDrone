@@ -9,7 +9,7 @@ def start_windows():
     subprocess.Popen('start "Drone: ESP32" cmd /k "node ESP32/ESP32_Firmware.js"', shell=True)
     time.sleep(2)
     # Open Raspberry Pi in a new Command Prompt
-    subprocess.Popen('start "Ground Station: Raspberry Pi" cmd /k "cd Raspberry_Pi && python Raspberry_Pi.py"', shell=True)
+    subprocess.Popen('start "Ground Station: Raspberry Pi" cmd /k "cd Raspberry_Pi && python raspberry_pi.py"', shell=True)
 
 def start_mac():
     print("Detected OS: macOS")
