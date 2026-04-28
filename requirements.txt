@@ -9,8 +9,6 @@ pycparser==3.0
 pyserial==3.5
 PyYAML==6.0.3
 requests==2.33.1
-sherpa-onnx-core==1.12.37
-sherpa_onnx==1.12.37
 sounddevice==0.5.5
 srt==3.5.3
 tqdm==4.67.3

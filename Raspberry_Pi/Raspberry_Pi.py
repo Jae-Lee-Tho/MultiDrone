@@ -102,12 +102,12 @@ def audio_callback(indata, _frames, _time_info, _status) -> None:
     global ACTIVE_VOICE_CMD, ACTIVE_VOICE_TIME
     if rec.AcceptWaveform(bytes(indata)):
         result = json.loads(rec.Result())
-        text   = result.get("text", "").strip()
+        text = result.get("text", "").strip()
         if text:
             cmd = map_speech_to_command(text)
             if cmd:
                 print(f"[VOICE HEARD] -> {cmd.value}")
-                ACTIVE_VOICE_CMD  = cmd
+                ACTIVE_VOICE_CMD = cmd
                 ACTIVE_VOICE_TIME = time.time()
 
 
