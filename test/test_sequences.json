@@ -1,0 +1,42 @@
+{
+  "tests": [
+    {
+      "name": "Level 1 - Easy",
+      "sequence": [
+        "FORWARD",
+        "BACKWARD"
+      ]
+    },
+    {
+      "name": "Level 2 - Medium",
+      "sequence": [
+        "LEFT",
+        "LEFT",
+        "RIGHT",
+        "RIGHT"
+      ]
+    },
+    {
+      "name": "Level 3 - Hard",
+      "sequence": [
+        "FORWARD",
+        "LEFT",
+        "RIGHT",
+        "BACKWARD"
+      ]
+    },
+    {
+      "name": "Level 4 - Expert",
+      "sequence": [
+        "FORWARD",
+        "LEFT",
+        "BACKWARD",
+        "RIGHT",
+        "FORWARD",
+        "RIGHT",
+        "BACKWARD",
+        "LEFT"
+      ]
+    }
+  ]
+}
