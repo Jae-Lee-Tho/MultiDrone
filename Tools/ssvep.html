@@ -1,0 +1,742 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SSVEP Stimulus</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Rajdhani:wght@300;400;600;700&display=swap');
+
+  :root {
+    --bg: #080c10;
+    --surface: #0d1520;
+    --border: #1a2a3a;
+    --accent: #00e5ff;
+    --accent2: #ff6b35;
+    --accent3: #7fff00;
+    --text: #c8dae8;
+    --text-dim: #4a6a7a;
+    --danger: #ff3355;
+    --mono: 'Share Tech Mono', monospace;
+    --sans: 'Rajdhani', sans-serif;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--sans);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* ── SETUP PAGE ── */
+  #setup-page {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .header {
+    padding: 28px 40px 20px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: baseline;
+    gap: 16px;
+  }
+
+  .header h1 {
+    font-family: var(--mono);
+    font-size: 1.1rem;
+    color: var(--accent);
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+  }
+
+  .header p {
+    font-size: 0.85rem;
+    color: var(--text-dim);
+    letter-spacing: 0.05em;
+  }
+
+  .setup-body {
+    flex: 1;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0;
+  }
+
+  .setup-left {
+    padding: 36px 40px;
+    border-right: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    gap: 28px;
+  }
+
+  .setup-right {
+    padding: 36px 40px;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+  }
+
+  .section-label {
+    font-family: var(--mono);
+    font-size: 0.7rem;
+    color: var(--accent);
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    margin-bottom: 14px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .section-label::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+  }
+
+  .control-row {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin-bottom: 16px;
+  }
+
+  .control-row label {
+    font-size: 0.8rem;
+    color: var(--text-dim);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  .control-row .value-display {
+    font-family: var(--mono);
+    font-size: 0.9rem;
+    color: var(--accent);
+  }
+
+  input[type=range] {
+    -webkit-appearance: none;
+    width: 100%;
+    height: 2px;
+    background: var(--border);
+    outline: none;
+    border-radius: 0;
+  }
+
+  input[type=range]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 14px;
+    height: 14px;
+    background: var(--accent);
+    cursor: pointer;
+    border-radius: 0;
+    clip-path: polygon(50% 0%, 100% 100%, 0% 100%);
+    transform: rotate(180deg);
+  }
+
+  input[type=number], input[type=text], select {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    color: var(--text);
+    font-family: var(--mono);
+    font-size: 0.9rem;
+    padding: 8px 12px;
+    outline: none;
+    width: 100%;
+    transition: border-color 0.2s;
+  }
+
+  input[type=number]:focus, select:focus {
+    border-color: var(--accent);
+  }
+
+  select option { background: var(--surface); }
+
+  /* ── BOX CONFIG CARDS ── */
+  #box-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    max-height: 60vh;
+    overflow-y: auto;
+    padding-right: 4px;
+  }
+
+  #box-list::-webkit-scrollbar { width: 3px; }
+  #box-list::-webkit-scrollbar-track { background: transparent; }
+  #box-list::-webkit-scrollbar-thumb { background: var(--border); }
+
+  .box-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    padding: 14px 16px;
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr 1fr auto;
+    gap: 10px;
+    align-items: end;
+    position: relative;
+    transition: border-color 0.2s;
+  }
+
+  .box-card:hover { border-color: #2a3a4a; }
+
+  .box-card .card-label {
+    font-family: var(--mono);
+    font-size: 0.65rem;
+    color: var(--text-dim);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    margin-bottom: 5px;
+  }
+
+  .box-card input[type=number] { padding: 6px 8px; font-size: 0.8rem; }
+
+  .box-index {
+    position: absolute;
+    top: 8px;
+    right: 10px;
+    font-family: var(--mono);
+    font-size: 0.6rem;
+    color: var(--text-dim);
+  }
+
+  .color-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    display: inline-block;
+    margin-right: 6px;
+    vertical-align: middle;
+  }
+
+  .btn-remove {
+    background: none;
+    border: 1px solid #ff333533;
+    color: var(--danger);
+    font-family: var(--mono);
+    font-size: 0.7rem;
+    padding: 6px 10px;
+    cursor: pointer;
+    letter-spacing: 0.1em;
+    transition: all 0.2s;
+    align-self: end;
+  }
+
+  .btn-remove:hover { background: #ff333520; border-color: var(--danger); }
+
+  .btn-add {
+    background: none;
+    border: 1px dashed var(--border);
+    color: var(--text-dim);
+    font-family: var(--mono);
+    font-size: 0.75rem;
+    padding: 10px;
+    cursor: pointer;
+    width: 100%;
+    letter-spacing: 0.1em;
+    transition: all 0.2s;
+    text-transform: uppercase;
+  }
+
+  .btn-add:hover { border-color: var(--accent); color: var(--accent); }
+
+  /* ── LAUNCH BUTTON ── */
+  .launch-wrap {
+    padding: 24px 40px;
+    border-top: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .info-text {
+    font-family: var(--mono);
+    font-size: 0.72rem;
+    color: var(--text-dim);
+    line-height: 1.6;
+  }
+
+  .info-text span { color: var(--accent2); }
+
+  .btn-launch {
+    background: var(--accent);
+    color: var(--bg);
+    border: none;
+    font-family: var(--mono);
+    font-size: 0.85rem;
+    font-weight: 700;
+    padding: 14px 40px;
+    cursor: pointer;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    clip-path: polygon(8px 0%, 100% 0%, calc(100% - 8px) 100%, 0% 100%);
+    transition: opacity 0.2s, transform 0.1s;
+  }
+
+  .btn-launch:hover { opacity: 0.85; transform: scale(1.02); }
+  .btn-launch:active { transform: scale(0.98); }
+
+  /* ── VALID FREQUENCIES ── */
+  .freq-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: 6px;
+  }
+
+  .freq-pill {
+    font-family: var(--mono);
+    font-size: 0.72rem;
+    padding: 3px 9px;
+    border: 1px solid var(--border);
+    color: var(--text-dim);
+    cursor: pointer;
+    transition: all 0.15s;
+    border-radius: 0;
+  }
+
+  .freq-pill:hover { border-color: var(--accent3); color: var(--accent3); }
+
+  /* ── STIMULUS PAGE ── */
+  #stimulus-page {
+    display: none;
+    width: 100vw;
+    height: 100vh;
+    background: #000;
+    position: relative;
+    overflow: hidden;
+  }
+
+  #stimulus-canvas {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+  }
+
+  /* ── STIMULUS HUD ── */
+  .stim-hud {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: rgba(8, 12, 16, 0.9);
+    border-top: 1px solid #1a2a3a;
+    padding: 12px 24px;
+    display: flex;
+    align-items: center;
+    gap: 24px;
+    font-family: var(--mono);
+    font-size: 0.72rem;
+    color: var(--text-dim);
+    backdrop-filter: blur(6px);
+    z-index: 100;
+  }
+
+  .hud-item { display: flex; align-items: center; gap: 8px; }
+  .hud-dot { width: 6px; height: 6px; border-radius: 50%; }
+  .hud-freq { color: var(--text); }
+
+  .btn-stop {
+    margin-left: auto;
+    background: none;
+    border: 1px solid var(--danger);
+    color: var(--danger);
+    font-family: var(--mono);
+    font-size: 0.72rem;
+    padding: 6px 18px;
+    cursor: pointer;
+    letter-spacing: 0.1em;
+    transition: all 0.2s;
+  }
+
+  .btn-stop:hover { background: #ff333520; }
+
+  .stim-timer {
+    font-family: var(--mono);
+    font-size: 0.72rem;
+    color: var(--accent);
+    margin-left: auto;
+  }
+
+  /* ── CROSSHAIR ── */
+  .crosshair {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    pointer-events: none;
+    z-index: 50;
+  }
+
+  .crosshair line { stroke: rgba(255,255,255,0.15); stroke-width: 1; }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 768px) {
+    .setup-body { grid-template-columns: 1fr; }
+    .setup-left { border-right: none; border-bottom: 1px solid var(--border); }
+    .box-card { grid-template-columns: 1fr 1fr; }
+    .box-card > div:nth-child(4), .btn-remove { grid-column: span 1; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ════════════ SETUP PAGE ════════════ -->
+<div id="setup-page">
+  <div class="header">
+    <h1>▸ SSVEP Stimulus</h1>
+    <p>Steady-State Visually Evoked Potential — 60 Hz Display</p>
+  </div>
+
+  <div class="setup-body">
+
+    <!-- LEFT: Global settings -->
+    <div class="setup-left">
+      <div>
+        <div class="section-label">Global Settings</div>
+
+        <div class="control-row">
+          <label>Background Color</label>
+          <select id="bg-color">
+            <option value="#000000">Black (recommended)</option>
+            <option value="#808080">Gray (50%)</option>
+            <option value="#ffffff">White</option>
+          </select>
+        </div>
+
+        <div class="control-row">
+          <label>Stimulus Shape</label>
+          <select id="stim-shape">
+            <option value="rect">Rectangle</option>
+            <option value="circle">Circle</option>
+            <option value="checkerboard">Checkerboard (stronger SSVEP)</option>
+          </select>
+        </div>
+
+        <div class="control-row">
+          <label>Show Fixation Crosshair</label>
+          <select id="show-crosshair">
+            <option value="yes">Yes — helps maintain gaze</option>
+            <option value="no">No</option>
+          </select>
+        </div>
+
+        <div class="control-row">
+          <label>HUD visibility</label>
+          <select id="show-hud">
+            <option value="yes">Yes — show frequency bar</option>
+            <option value="no">No — full black</option>
+          </select>
+        </div>
+      </div>
+
+      <div>
+        <div class="section-label">Valid 60 Hz Frequencies</div>
+        <p style="font-size:0.78rem; color:var(--text-dim); margin-bottom:10px; line-height:1.5;">
+          Only these frequencies produce perfectly even flicker on a 60 Hz display. Click to copy into a box below.
+        </p>
+        <div class="freq-grid" id="freq-pills"></div>
+      </div>
+    </div>
+
+    <!-- RIGHT: Per-box config -->
+    <div class="setup-right">
+      <div>
+        <div class="section-label">Stimulus Boxes</div>
+        <p style="font-size:0.78rem; color:var(--text-dim); margin-bottom:14px; line-height:1.5;">
+          Position is in % of screen. Size in px. Frequency must be a valid 60 Hz value.
+        </p>
+        <div id="box-list"></div>
+        <button class="btn-add" onclick="addBox()">+ Add Stimulus Box</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="launch-wrap">
+    <div class="info-text">
+      Stare at a box with peripheral focus. Your visual cortex will lock to its frequency.<br>
+      EEG analysis should show a peak at <span>that Hz and harmonics (2×, 3×)</span>.
+    </div>
+    <button class="btn-launch" onclick="launchStimulus()">▶ Launch Stimulus</button>
+  </div>
+</div>
+
+<!-- ════════════ STIMULUS PAGE ════════════ -->
+<div id="stimulus-page">
+  <canvas id="stimulus-canvas"></canvas>
+
+  <svg class="crosshair" id="crosshair-svg" width="40" height="40" viewBox="0 0 40 40">
+    <line x1="20" y1="0" x2="20" y2="40"/>
+    <line x1="0" y1="20" x2="40" y2="20"/>
+    <circle cx="20" cy="20" r="2" fill="rgba(255,255,255,0.2)"/>
+  </svg>
+
+  <div class="stim-hud" id="stim-hud">
+    <div id="hud-boxes" style="display:flex;gap:20px;flex-wrap:wrap;"></div>
+    <div class="stim-timer" id="stim-timer">00:00</div>
+    <button class="btn-stop" onclick="stopStimulus()">■ STOP</button>
+  </div>
+</div>
+
+<script>
+// ── VALID 60Hz FREQUENCIES ──
+const VALID_FREQS = [6, 7.5, 10, 12, 15, 20, 30];
+const BOX_COLORS = ['#00e5ff','#ff6b35','#7fff00','#ff3399','#b388ff','#ffd600','#00e676'];
+
+// ── STATE ──
+let boxes = [];
+let nextId = 1;
+
+// ── INIT ──
+function init() {
+  // Render freq pills
+  const pillContainer = document.getElementById('freq-pills');
+  VALID_FREQS.forEach(f => {
+    const pill = document.createElement('button');
+    pill.className = 'freq-pill';
+    pill.textContent = f + ' Hz';
+    pill.onclick = () => setLastBoxFreq(f);
+    pillContainer.appendChild(pill);
+  });
+
+  // Default: 3 boxes
+  addBox(10, 20, 30, 160, 160);
+  addBox(50, 50, 15, 160, 160);
+  addBox(80, 20, 12, 160, 160);
+}
+
+function setLastBoxFreq(f) {
+  if (boxes.length === 0) return;
+  const last = boxes[boxes.length - 1];
+  document.getElementById('freq-' + last.id).value = f;
+}
+
+// ── BOX MANAGEMENT ──
+function addBox(x = 40, y = 40, freq = 10, w = 150, h = 150) {
+  const id = nextId++;
+  boxes.push({ id });
+  renderBoxList();
+  // Set defaults after render
+  document.getElementById('x-' + id).value = x;
+  document.getElementById('y-' + id).value = y;
+  document.getElementById('freq-' + id).value = freq;
+  document.getElementById('w-' + id).value = w;
+  document.getElementById('h-' + id).value = h;
+}
+
+function removeBox(id) {
+  boxes = boxes.filter(b => b.id !== id);
+  renderBoxList();
+}
+
+function renderBoxList() {
+  const list = document.getElementById('box-list');
+  list.innerHTML = '';
+  boxes.forEach((b, i) => {
+    const color = BOX_COLORS[i % BOX_COLORS.length];
+    const card = document.createElement('div');
+    card.className = 'box-card';
+    card.innerHTML = `
+      <span class="box-index"><span class="color-dot" style="background:${color}"></span>BOX ${i+1}</span>
+      <div>
+        <div class="card-label">Freq (Hz)</div>
+        <input type="number" id="freq-${b.id}" min="6" max="30" step="0.1" value="10">
+      </div>
+      <div>
+        <div class="card-label">X pos (%)</div>
+        <input type="number" id="x-${b.id}" min="0" max="95" value="40">
+      </div>
+      <div>
+        <div class="card-label">Y pos (%)</div>
+        <input type="number" id="y-${b.id}" min="0" max="95" value="40">
+      </div>
+      <div>
+        <div class="card-label">Width (px)</div>
+        <input type="number" id="w-${b.id}" min="40" max="800" value="150">
+      </div>
+      <div>
+        <div class="card-label">Height (px)</div>
+        <input type="number" id="h-${b.id}" min="40" max="800" value="150">
+      </div>
+      <button class="btn-remove" onclick="removeBox(${b.id})">✕ Remove</button>
+    `;
+    list.appendChild(card);
+  });
+}
+
+// ── READ CONFIG ──
+function readConfig() {
+  return boxes.map((b, i) => {
+    const freq = parseFloat(document.getElementById('freq-' + b.id).value);
+    const x    = parseFloat(document.getElementById('x-'    + b.id).value);
+    const y    = parseFloat(document.getElementById('y-'    + b.id).value);
+    const w    = parseFloat(document.getElementById('w-'    + b.id).value);
+    const h    = parseFloat(document.getElementById('h-'    + b.id).value);
+    return { freq, x, y, w, h, color: BOX_COLORS[i % BOX_COLORS.length] };
+  });
+}
+
+// ── STIMULUS ENGINE ──
+let animFrame = null;
+let startTime = null;
+let stimConfig = [];
+let bgColor = '#000000';
+let shape = 'rect';
+let timerInterval = null;
+
+function launchStimulus() {
+  if (boxes.length === 0) { alert('Add at least one stimulus box.'); return; }
+  stimConfig = readConfig();
+  bgColor = document.getElementById('bg-color').value;
+  shape = document.getElementById('stim-shape').value;
+  const showCrosshair = document.getElementById('show-crosshair').value === 'yes';
+  const showHud = document.getElementById('show-hud').value === 'yes';
+
+  // Validate frequencies
+  for (const b of stimConfig) {
+    if (!VALID_FREQS.includes(b.freq)) {
+      alert(`${b.freq} Hz is not a valid 60 Hz frequency.\nValid values: ${VALID_FREQS.join(', ')} Hz`);
+      return;
+    }
+  }
+
+  // Build HUD
+  const hudBoxes = document.getElementById('hud-boxes');
+  hudBoxes.innerHTML = '';
+  stimConfig.forEach(b => {
+    const item = document.createElement('div');
+    item.className = 'hud-item';
+    item.innerHTML = `<div class="hud-dot" style="background:${b.color}"></div><span class="hud-freq">${b.freq} Hz</span>`;
+    hudBoxes.appendChild(item);
+  });
+
+  document.getElementById('crosshair-svg').style.display = showCrosshair ? 'block' : 'none';
+  document.getElementById('stim-hud').style.display = showHud ? 'flex' : 'none';
+
+  // Show stimulus page
+  document.getElementById('setup-page').style.display = 'none';
+  document.getElementById('stimulus-page').style.display = 'block';
+
+  // Resize canvas
+  const canvas = document.getElementById('stimulus-canvas');
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+
+  startTime = null;
+  startTimer();
+  animFrame = requestAnimationFrame(renderFrame);
+}
+
+function stopStimulus() {
+  if (animFrame) cancelAnimationFrame(animFrame);
+  clearInterval(timerInterval);
+  document.getElementById('stimulus-page').style.display = 'none';
+  document.getElementById('setup-page').style.display = 'flex';
+}
+
+function startTimer() {
+  const timerEl = document.getElementById('stim-timer');
+  const t0 = Date.now();
+  clearInterval(timerInterval);
+  timerInterval = setInterval(() => {
+    const s = Math.floor((Date.now() - t0) / 1000);
+    const mm = String(Math.floor(s / 60)).padStart(2, '0');
+    const ss = String(s % 60).padStart(2, '0');
+    timerEl.textContent = mm + ':' + ss;
+  }, 500);
+}
+
+function renderFrame(timestamp) {
+  if (!startTime) startTime = timestamp;
+  const elapsed = (timestamp - startTime) / 1000; // seconds
+
+  const canvas = document.getElementById('stimulus-canvas');
+  const ctx = canvas.getContext('2d');
+  const W = canvas.width;
+  const H = canvas.height;
+
+  // Background
+  ctx.fillStyle = bgColor;
+  ctx.fillRect(0, 0, W, H);
+
+  stimConfig.forEach(b => {
+    // Is this frame ON or OFF?
+    // For frequency f, period = 1/f seconds
+    // Half-period = 1/(2f), so on for first half, off for second half
+    const phase = (elapsed * b.freq) % 1;
+    const isOn = phase < 0.5;
+
+    const px = (b.x / 100) * W;
+    const py = (b.y / 100) * H;
+    const pw = b.w;
+    const ph = b.h;
+
+    if (shape === 'rect') {
+      ctx.fillStyle = isOn ? '#ffffff' : '#000000';
+      ctx.fillRect(px, py, pw, ph);
+    } else if (shape === 'circle') {
+      ctx.beginPath();
+      ctx.arc(px + pw/2, py + ph/2, Math.min(pw, ph)/2, 0, Math.PI*2);
+      ctx.fillStyle = isOn ? '#ffffff' : '#000000';
+      ctx.fill();
+    } else if (shape === 'checkerboard') {
+      // 8x8 checkerboard that inverts each cycle
+      const tileW = pw / 8;
+      const tileH = ph / 8;
+      for (let row = 0; row < 8; row++) {
+        for (let col = 0; col < 8; col++) {
+          const parity = (row + col) % 2;
+          const white = isOn ? (parity === 0) : (parity === 1);
+          ctx.fillStyle = white ? '#ffffff' : '#000000';
+          ctx.fillRect(px + col * tileW, py + row * tileH, tileW + 0.5, tileH + 0.5);
+        }
+      }
+    }
+
+    // Border
+    ctx.strokeStyle = b.color;
+    ctx.lineWidth = 2;
+    if (shape === 'circle') {
+      ctx.beginPath();
+      ctx.arc(px + pw/2, py + ph/2, Math.min(pw, ph)/2 + 2, 0, Math.PI*2);
+      ctx.stroke();
+    } else {
+      ctx.strokeRect(px - 1, py - 1, pw + 2, ph + 2);
+    }
+
+    // Label
+    ctx.fillStyle = b.color;
+    ctx.font = '600 11px Share Tech Mono, monospace';
+    ctx.fillText(b.freq + ' Hz', px + 4, py - 6);
+  });
+
+  animFrame = requestAnimationFrame(renderFrame);
+}
+
+// ── RESIZE ──
+window.addEventListener('resize', () => {
+  if (document.getElementById('stimulus-page').style.display === 'block') {
+    const canvas = document.getElementById('stimulus-canvas');
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+  }
+});
+
+// ── KEYBOARD SHORTCUT ──
+window.addEventListener('keydown', e => {
+  if (e.key === 'Escape' && document.getElementById('stimulus-page').style.display === 'block') {
+    stopStimulus();
+  }
+});
+
+init();
+</script>
+</body>
+</html>

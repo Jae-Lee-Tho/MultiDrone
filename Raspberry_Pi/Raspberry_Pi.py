@@ -87,6 +87,10 @@ ESP32_PORT = 4210           # must match UDP_PORT in ESP32_Firmware.ino
 
 _udp_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 
+TELEMETRY_IP = "127.0.0.1"
+TELEMETRY_PORT = 4211
+_telemetry_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+
 
 # =============================================================================
 # SECTION 3 — RC CHANNEL VALUES
@@ -439,6 +443,22 @@ def main_control_loop() -> None:
             f"{rc_channels['arm']}"
         )
         _udp_socket.sendto(payload.encode("utf-8"), (ESP32_IP, ESP32_PORT))
+
+        # --- TELEMETRY FOR TEST RUNNER ---
+        telemetry = {
+            "timestamp": now,
+            "mode": EXPERIMENT_MODE.value,
+            "state": drone_state.value,
+            "voice_cmd": active_voice_cmd.value if active_voice_cmd else None,
+            "emg_cmd": active_emg_cmd.value if active_emg_cmd else None,
+            "final_cmd": final_cmd.value if final_cmd else None,
+            "is_moving": is_moving,
+            "rc_channels": rc_channels
+        }
+        try:
+            _telemetry_socket.sendto(json.dumps(telemetry).encode("utf-8"), (TELEMETRY_IP, TELEMETRY_PORT))
+        except Exception:
+            pass
 
         time.sleep(0.02)   # 50Hz — do not change, the ESP32 and FC expect this rate
 

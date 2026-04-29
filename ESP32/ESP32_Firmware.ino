@@ -112,6 +112,96 @@ const uint16_t UDP_PORT = 4210;   // must match ESP32_PORT in raspberry_pi.py
 WiFiUDP udp;
 char    udpBuffer[64];   // large enough for "1500,1500,1000,1500,1000\0"
 
+IPAddress piIP;
+bool      piConnected = false;
+const uint16_t TELEMETRY_PORT = 4212; // Port test_runner.py listens on
+
+// =============================================================================
+// SECTION 4.5 — MSP TELEMETRY PARSER
+// =============================================================================
+
+enum MspState { IDLE, HEADER_M, HEADER_ARROW, SIZE, CMD, PAYLOAD, CHECKSUM };
+MspState parserState = IDLE;
+uint8_t mspPayloadSize = 0;
+uint8_t mspCommand = 0;
+uint8_t mspChecksum = 0;
+uint8_t mspPayloadBuffer[64];
+uint8_t mspPayloadIdx = 0;
+
+void requestMsp(uint8_t cmd) {
+    uint8_t req[6] = {'$', 'M', '<', 0, cmd, cmd};
+    FC_SERIAL.write(req, 6);
+}
+
+void parseMspByte(uint8_t c) {
+    switch(parserState) {
+        case IDLE:
+            if(c == '$') parserState = HEADER_M;
+            break;
+        case HEADER_M:
+            parserState = (c == 'M') ? HEADER_ARROW : IDLE;
+            break;
+        case HEADER_ARROW:
+            // '>' means FC sending to ESP
+            parserState = (c == '>') ? SIZE : IDLE;
+            break;
+        case SIZE:
+            mspPayloadSize = c;
+            mspChecksum = c;
+            mspPayloadIdx = 0;
+            parserState = CMD;
+            break;
+        case CMD:
+            mspCommand = c;
+            mspChecksum ^= c;
+            parserState = (mspPayloadSize > 0) ? PAYLOAD : CHECKSUM;
+            break;
+        case PAYLOAD:
+            if(mspPayloadIdx < sizeof(mspPayloadBuffer)) {
+                mspPayloadBuffer[mspPayloadIdx++] = c;
+            }
+            mspChecksum ^= c;
+            if(mspPayloadIdx == mspPayloadSize) parserState = CHECKSUM;
+            break;
+        case CHECKSUM:
+            if(c == mspChecksum) {
+                // Packet is valid!
+                if(mspCommand == 108 && piConnected) { // MSP_ATTITUDE
+                    int16_t roll = mspPayloadBuffer[0] | (mspPayloadBuffer[1] << 8);
+                    int16_t pitch = mspPayloadBuffer[2] | (mspPayloadBuffer[3] << 8);
+                    int16_t yaw = mspPayloadBuffer[4] | (mspPayloadBuffer[5] << 8);
+
+                    // Convert integer tenths of a degree to floats
+                    float rollDeg = roll / 10.0;
+                    float pitchDeg = pitch / 10.0;
+
+                    char jsonBuf[128];
+                    snprintf(jsonBuf, sizeof(jsonBuf),
+                             "{\"type\":\"attitude\",\"roll\":%.1f,\"pitch\":%.1f,\"yaw\":%d}",
+                             rollDeg, pitchDeg, yaw);
+
+                    udp.beginPacket(piIP, TELEMETRY_PORT);
+                    udp.print(jsonBuf);
+                    udp.endPacket();
+                } else if(mspCommand == 110 && piConnected) { // MSP_ANALOG
+                    float vbat = mspPayloadBuffer[0] / 10.0;
+                    float current = (mspPayloadBuffer[3] | (mspPayloadBuffer[4] << 8)) / 100.0;
+
+                    char jsonBuf[128];
+                    snprintf(jsonBuf, sizeof(jsonBuf),
+                             "{\"type\":\"analog\",\"vbat\":%.1f,\"current\":%.2f}",
+                             vbat, current);
+
+                    udp.beginPacket(piIP, TELEMETRY_PORT);
+                    udp.print(jsonBuf);
+                    udp.endPacket();
+                }
+            }
+            parserState = IDLE;
+            break;
+    }
+}
+
 
 // =============================================================================
 // SECTION 5 — MSP PACKET BUILDER
@@ -214,35 +304,44 @@ void setup() {
 //   1. Check if a UDP packet has arrived from the Raspberry Pi
 //   2. Parse the CSV string into RC channel values
 //   3. Encode and send an MSP packet to Betaflight over UART
+//   4. Periodically request FC telemetry and forward it
 // =============================================================================
+
+unsigned long lastMspReq = 0;
 
 void loop() {
     // --- Step 1: Check for incoming UDP packet ---
     int packetSize = udp.parsePacket();
-    if (packetSize == 0) return;   // nothing arrived yet, try next iteration
+    if (packetSize > 0) {
+        piIP = udp.remoteIP();
+        piConnected = true;
 
-    int len = udp.read(udpBuffer, sizeof(udpBuffer) - 1);
-    if (len <= 0) return;
-    udpBuffer[len] = '\0';         // null-terminate for string parsing
+        int len = udp.read(udpBuffer, sizeof(udpBuffer) - 1);
+        if (len > 0) {
+            udpBuffer[len] = '\0';         // null-terminate for string parsing
 
-    // --- Step 2: Parse CSV into channel values ---
-    // Expected format from Raspberry Pi: "roll,pitch,throttle,yaw,arm"
-    // e.g. "1500,1700,1600,1500,2000"
-    //
-    // Safe defaults (neutral hover, disarmed) in case parsing fails partway through.
-    uint16_t channels[RC_CHANNEL_COUNT] = {1500, 1500, 1000, 1500, 1000};
+            // --- Step 2: Parse CSV into channel values ---
+            uint16_t channels[RC_CHANNEL_COUNT] = {1500, 1500, 1000, 1500, 1000};
+            char*   token = strtok(udpBuffer, ",");
+            for (int i = 0; i < RC_CHANNEL_COUNT && token != nullptr; i++) {
+                channels[i] = (uint16_t)atoi(token);
+                token        = strtok(nullptr, ",");
+            }
 
-    char*   token = strtok(udpBuffer, ",");
-    for (int i = 0; i < RC_CHANNEL_COUNT && token != nullptr; i++) {
-        channels[i] = (uint16_t)atoi(token);
-        token        = strtok(nullptr, ",");
+            // --- Step 3: Encode and send MSP packet to Betaflight ---
+            sendMspSetRawRc(channels, RC_CHANNEL_COUNT);
+        }
     }
 
-    // --- Step 3: Encode and send MSP packet to Betaflight ---
-    sendMspSetRawRc(channels, RC_CHANNEL_COUNT);
+    // --- Step 4: Poll Betaflight Telemetry ---
+    // Request MSP_ATTITUDE every 100ms (10Hz)
+    if (millis() - lastMspReq > 100) {
+        lastMspReq = millis();
+        requestMsp(108); // 108 = MSP_ATTITUDE
+    }
 
-    // Debug output — visible in Arduino IDE Serial Monitor.
-    // Comment this out once everything is working to reduce noise.
-    Serial.printf("[ESP32] MSP sent → roll:%d  pitch:%d  thr:%d  yaw:%d  arm:%d\n",
-                  channels[0], channels[1], channels[2], channels[3], channels[4]);
+    // Process incoming bytes from Betaflight
+    while (FC_SERIAL.available()) {
+        parseMspByte(FC_SERIAL.read());
+    }
 }

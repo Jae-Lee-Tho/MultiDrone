@@ -70,18 +70,66 @@ function parseByte(byte) {
     }
 }
 
+let currentRc = [1500, 1500, 1000, 1500, 1000];
+
 function dispatchCommand(cmd, payload) {
-    if (cmd !== MSP_SET_RAW_RC) {
+    if (cmd === MSP_SET_RAW_RC) {
+        const channelCount = Math.floor(payload.length / 2);
+        const channels = [];
+        for (let i = 0; i < channelCount; i++) {
+            channels.push(payload[i * 2] | (payload[i * 2 + 1] << 8));
+        }
+        currentRc = channels;
+        lastSerialPacketTime = Date.now();
+        renderChannels(channels);
+    } else if (cmd === 108) { // MSP_ATTITUDE
+        // Simulate physical tilt based on RC inputs
+        // Roll: 1500 -> 0 degrees, 1600 -> +10.0 degrees (stored as 100)
+        const simRoll = (currentRc[0] - 1500);
+        const simPitch = -(currentRc[1] - 1500); // Forward pitch drops nose
+        const simYaw = (currentRc[3] - 1500);
+
+        const buf = Buffer.alloc(6);
+        buf.writeInt16LE(simRoll, 0);
+        buf.writeInt16LE(simPitch, 2);
+        buf.writeInt16LE(simYaw, 4);
+
+        sendResponse(108, buf);
+    } else if (cmd === 110) { // MSP_ANALOG
+        const buf = Buffer.alloc(7);
+        // Simulate battery voltage (e.g. 24.0V on a 6S battery -> 240)
+        buf.writeUInt8(240, 0);
+        // mAh drawn placeholder
+        buf.writeUInt16LE(0, 1);
+        // Simulate Amperage draw based on throttle and movement
+        const baseCurrent = (currentRc[2] > 1100) ? 1500 : 50; // 15A flying, 0.5A idle
+        const moveCurrent = Math.abs(currentRc[1] - 1500) + Math.abs(currentRc[0] - 1500);
+        buf.writeUInt16LE(baseCurrent + moveCurrent, 3); // Amperage (in 0.01A steps)
+
+        sendResponse(110, buf);
+    } else {
         console.log(`[FC] Unknown MSP command: ${cmd}`);
-        return;
     }
-    const channelCount = Math.floor(payload.length / 2);
-    const channels = [];
-    for (let i = 0; i < channelCount; i++) {
-        channels.push(payload[i * 2] | (payload[i * 2 + 1] << 8));
+}
+
+function sendResponse(cmd, payloadBuf) {
+    const packet = Buffer.alloc(6 + payloadBuf.length);
+    packet[0] = 0x24; // '$'
+    packet[1] = 0x4D; // 'M'
+    packet[2] = 0x3E; // '>'
+    packet[3] = payloadBuf.length;
+    packet[4] = cmd;
+
+    let checksum = packet[3] ^ packet[4];
+    for(let i=0; i<payloadBuf.length; i++) {
+        packet[5+i] = payloadBuf[i];
+        checksum ^= payloadBuf[i];
     }
-    lastSerialPacketTime = Date.now();
-    renderChannels(channels);
+    packet[5+payloadBuf.length] = checksum;
+
+    if (module.exports.onSerialData) {
+        module.exports.onSerialData(packet);
+    }
 }
 
 function renderChannels(channels) {
