@@ -7,14 +7,21 @@ import threading
 from datetime import datetime
 
 TELEMETRY_IP = "0.0.0.0"
-TELEMETRY_PORT = 4211
-ESP32_TELEMETRY_PORT = 4212
+TELEMETRY_PORT = 4211  # We only need this port now! The main script forwards everything here.
 
 recording = True
 
 def load_sequences():
-    with open('test_sequences.json', 'r') as f:
-        return json.load(f)["tests"]
+    # Fallback sequences in case the JSON isn't found
+    try:
+        with open('test_sequences.json', 'r') as f:
+            return json.load(f)["tests"]
+    except FileNotFoundError:
+        return [
+            {"name": "Level 1 - Easy", "sequence": ["FORWARD", "BACKWARD"]},
+            {"name": "Level 2 - Medium", "sequence": ["LEFT", "LEFT", "RIGHT", "RIGHT"]},
+            {"name": "Level 3 - Hard", "sequence":["FORWARD", "LEFT", "RIGHT", "BACKWARD"]}
+        ]
 
 def end_test_monitor():
     global recording
@@ -27,8 +34,8 @@ def main():
     print("   DRONE METHOD COMPARISON TEST RUNNER")
     print("========================================")
 
-    # Select method
-    methods = ["VOICE_ONLY", "EMG_ONLY", "VOICE_AND_EMG", "PHYSICAL_CONTROLLER"]
+    # Select method (Fixed EMG -> EEG)
+    methods =["VOICE_ONLY", "EEG_ONLY", "VOICE_AND_EEG", "PHYSICAL_CONTROLLER"]
     print("\nSelect the control method you are testing:")
     for i, m in enumerate(methods):
         print(f"  {i+1}. {m}")
@@ -43,14 +50,10 @@ def main():
     seq_idx = int(input(f"Choice (1-{len(sequences)}): ")) - 1
     selected_test = sequences[seq_idx]
 
-    # Setup UDP sockets
-    pi_sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-    pi_sock.bind((TELEMETRY_IP, TELEMETRY_PORT))
-    pi_sock.setblocking(False)
-
-    esp_sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-    esp_sock.bind((TELEMETRY_IP, ESP32_TELEMETRY_PORT))
-    esp_sock.setblocking(False)
+    # Setup UDP socket (Only listening to the Python Main BCI Script)
+    main_script_sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    main_script_sock.bind((TELEMETRY_IP, TELEMETRY_PORT))
+    main_script_sock.setblocking(False)
 
     # Setup CSV logging
     os.makedirs('results', exist_ok=True)
@@ -59,15 +62,19 @@ def main():
 
     csv_file = open(filename, 'w', newline='')
     writer = csv.writer(csv_file)
+
+    # NEW HEADERS: Added eeg_score, physical_rc, and test elapsed time!
     writer.writerow([
-        "system_time", "source", "test_method", "test_name",
-        "drone_state", "voice_cmd", "emg_cmd", "final_cmd",
-        "is_moving", "rc_roll", "rc_pitch", "rc_throttle", "rc_yaw", "rc_arm",
-        "fc_roll_angle", "fc_pitch_angle", "fc_yaw_angle", "fc_voltage", "fc_current"
+        "system_time", "test_elapsed_sec", "test_method", "test_name",
+        "drone_state", "voice_cmd", "eeg_cmd", "final_cmd", "eeg_score",
+        "is_moving",
+        "bci_target_roll", "bci_target_pitch", "bci_target_throttle",
+        "phys_rc_roll", "phys_rc_pitch", "phys_rc_throttle",
+        "fc_roll_angle", "fc_pitch_angle", "fc_yaw_angle", "fc_voltage"
     ])
 
     print(f"\n[Ready] Logging data to: {filename}")
-    print("[Ready] Ensure Raspberry_Pi.py and ESP32_Firmware are running!")
+    print("[Ready] Ensure your Main BCI Script is running!")
 
     print("\n==================================================")
     print(f" GOAL SEQUENCE: {selected_test['sequence']}")
@@ -79,65 +86,71 @@ def main():
 
     threading.Thread(target=end_test_monitor, daemon=True).start()
 
-    last_fc_telemetry = {"roll": 0, "pitch": 0, "yaw": 0, "vbat": 0.0, "current": 0.0}
+    start_time = time.time()
+    commands_executed =[]
 
     try:
         while recording:
-            # Check for ESP32/FC Telemetry
             try:
-                data, _ = esp_sock.recvfrom(2048)
-                fc_telem = json.loads(data.decode('utf-8'))
-                if fc_telem.get("type") == "attitude":
-                    last_fc_telemetry["roll"] = fc_telem["roll"]
-                    last_fc_telemetry["pitch"] = fc_telem["pitch"]
-                    last_fc_telemetry["yaw"] = fc_telem["yaw"]
-                    writer.writerow([
-                        time.time(), "fc_attitude", selected_method, selected_test["name"],
-                        "", "", "", "", "", "", "", "", "", "",
-                        fc_telem["roll"], fc_telem["pitch"], fc_telem["yaw"], last_fc_telemetry["vbat"], last_fc_telemetry["current"]
-                    ])
-                elif fc_telem.get("type") == "analog":
-                    last_fc_telemetry["vbat"] = fc_telem["vbat"]
-                    last_fc_telemetry["current"] = fc_telem["current"]
-                    writer.writerow([
-                        time.time(), "fc_analog", selected_method, selected_test["name"],
-                        "", "", "", "", "", "", "", "", "", "",
-                        last_fc_telemetry["roll"], last_fc_telemetry["pitch"], last_fc_telemetry["yaw"], fc_telem["vbat"], fc_telem["current"]
-                    ])
-            except BlockingIOError:
-                pass
-
-            # Check for Raspberry Pi Telemetry
-            try:
-                data, _ = pi_sock.recvfrom(2048)
+                # Receive unified payload from the Main BCI script
+                data, _ = main_script_sock.recvfrom(4096)
                 telem = json.loads(data.decode('utf-8'))
+                current_time = time.time()
+                elapsed_sec = current_time - start_time
 
-                if telem.get("final_cmd"):
-                    print(f" -> Executed: {telem['final_cmd']}")
-                elif telem.get("voice_cmd") or telem.get("emg_cmd"):
-                    print(f" -> Detected (Dropped/Blocked): Voice='{telem.get('voice_cmd')}', EMG='{telem.get('emg_cmd')}'")
+                # Track commands for the summary
+                if telem.get("final_cmd") and (len(commands_executed) == 0 or commands_executed[-1] != telem["final_cmd"]):
+                    commands_executed.append(telem["final_cmd"])
+                    print(f"[{elapsed_sec:.1f}s] -> Executed: {telem['final_cmd']}")
 
-                rc = telem["rc_channels"]
+                bci_rc = telem.get("rc_channels", {})
+                fc_telem = telem.get("fc_telemetry", {})
+
                 writer.writerow([
-                    time.time(), "pi", selected_method, selected_test["name"],
-                    telem["state"], telem["voice_cmd"], telem["emg_cmd"], telem["final_cmd"],
-                    telem["is_moving"], rc["roll"], rc["pitch"], rc["throttle"], rc["yaw"], rc["arm"],
-                    last_fc_telemetry["roll"], last_fc_telemetry["pitch"], last_fc_telemetry["yaw"],
-                    last_fc_telemetry["vbat"], last_fc_telemetry["current"]
+                    current_time,
+                    round(elapsed_sec, 3),
+                    selected_method,
+                    selected_test["name"],
+                    telem.get("state"),
+                    telem.get("voice_cmd"),
+                    telem.get("eeg_cmd"),
+                    telem.get("final_cmd"),
+                    telem.get("eeg_score", 0.0),
+                    telem.get("is_moving", False),
+                    bci_rc.get("roll", 1500),
+                    bci_rc.get("pitch", 1500),
+                    bci_rc.get("throttle", 1000),
+                    fc_telem.get("rc_roll", 1500),   # From the new MSP_RC we added!
+                    fc_telem.get("rc_pitch", 1500),  # From the new MSP_RC we added!
+                    fc_telem.get("rc_throttle", 1000),
+                    fc_telem.get("roll", 0.0),
+                    fc_telem.get("pitch", 0.0),
+                    fc_telem.get("yaw", 0.0),
+                    fc_telem.get("vbat", 0.0)
                 ])
+
             except BlockingIOError:
                 pass
 
-            time.sleep(0.01)
+            time.sleep(0.01) # 100Hz max polling
 
     except KeyboardInterrupt:
         print("\n[Test Interrupted]")
 
     finally:
+        total_time = time.time() - start_time
         csv_file.close()
-        pi_sock.close()
-        esp_sock.close()
-        print(f"\n[Finished] Saved test data to {filename}")
+        main_script_sock.close()
+
+        print("\n==================================================")
+        print(f" TEST SUMMARY")
+        print("==================================================")
+        print(f"Method Used:   {selected_method}")
+        print(f"Sequence Goal: {selected_test['sequence']}")
+        print(f"Commands Seen: {commands_executed}")
+        print(f"Total Time:    {total_time:.2f} seconds")
+        print(f"Data Saved To: {filename}")
+        print("==================================================")
 
 if __name__ == "__main__":
     main()

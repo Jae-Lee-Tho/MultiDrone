@@ -1,141 +1,137 @@
 # =============================================================================
-# DRONE VOICE CONTROL — RASPBERRY PI
-# =============================================================================
-#
-# WHAT THIS FILE DOES:
-#   This is the "brain" of the system. It runs on a Raspberry Pi, listens to
-#   a microphone for voice commands, and sends RC channel values over Wi-Fi
-#   (UDP) to the ESP32, which forwards them to the flight controller.
-#
-# HOW THE FULL SYSTEM FITS TOGETHER:
-#
-#   [Microphone] ──► [Raspberry Pi] ──► Wi-Fi UDP ──► [ESP32] ──► UART ──► [Betaflight FC] ──► [Motors]
-#   [EMG Sensor] ──►        ↑
-#                      (this file)
-#
-# BEFORE RUNNING ON REAL HARDWARE — CHECKLIST:
-#   □ 1. Change ESP32_IP from "127.0.0.1" to "192.168.4.1"
-#         (that is the ESP32's default SoftAP IP when it creates its own hotspot)
-#         OR change it to whatever IP your phone hotspot assigns the ESP32.
-#   □ 2. Download the Vosk model and place it next to this file:
-#         https://alphacephei.com/vosk/models  →  vosk-model-small-en-us-0.15
-#   □ 3. Calibrate the RC channel values in apply_command() using the rc_sniffer
-#         tool while flying with your physical Radiomaster controller. The values
-#         currently in the code are reasonable starting estimates, not measured.
-#   □ 4. If using EMG, fill in emg_polling_thread() with your sensor's read logic.
-#   □ 5. Set EXPERIMENT_MODE to match what you are testing (see section 1 below).
-#
-# DEPENDENCIES (install with pip):
-#   pip install sounddevice vosk
-#
+# DRONE GROUND CONTROL STATION — LAPTOP (VOICE + EEG FUSION)
 # =============================================================================
 
 import socket
 import time
 import threading
 import json
+import numpy as np
+import datetime
 from enum import Enum
 
 import sounddevice as sd
+from scipy.signal import butter, sosfiltfilt, iirnotch, sosfilt, detrend
 from vosk import Model, KaldiRecognizer
+from pylsl import resolve_byprop, StreamInlet
+from sklearn.cross_decomposition import CCA
 
 
 # =============================================================================
-# SECTION 1 — EXPERIMENT MODE
-# =============================================================================
-# Controls which sensors are used to drive the drone.
-#
-#   VOICE_ONLY  → only voice commands count. EMG is ignored.
-#   EMG_ONLY    → only EMG gestures count. Voice is ignored.
-#   BOTH        → BOTH sensors must agree on the same command before it
-#                 executes. If they disagree, the command is dropped.
-#                 This is the safest mode for a live demo.
-#
-# ✏️  CHANGE THIS to switch between experiment phases:
+# SECTION 1 — EXPERIMENT MODE & CONFIG
 # =============================================================================
 
 class ExperimentMode(Enum):
-    VOICE_ONLY = "VOICE_ONLY"
-    EMG_ONLY   = "EMG_ONLY"
-    BOTH       = "BOTH"
+    VOICE_ONLY  = "VOICE_ONLY"
+    EEG_ONLY    = "EEG_ONLY"
+    BOTH        = "BOTH"
+    PHYSICAL_RC = "PHYSICAL_RC"
 
-EXPERIMENT_MODE = ExperimentMode.VOICE_ONLY   # ✏️  change here
+EXPERIMENT_MODE = ExperimentMode.BOTH
 
+# How long (in seconds) a directional command is held before auto-stopping.
+ACTION_DURATION = 1.0  # ✏️ tune
 
-# How many seconds a directional command (forward, left, etc.) stays active
-# before the drone automatically returns to a neutral hover.
-# Increase this if the drone doesn't move far enough; decrease if it overshoots.
-ACTION_DURATION = 1.0   # seconds  ✏️  tune this on real hardware
+# MOVEMENT STYLE CONFIGURATION
+# Set to True for cinematic, gliding movements.
+# Set to False for instant, aggressive "jerk" movements.
+ENABLE_SMOOTHING = True
+
+# How aggressively the actual RC values chase the target values each loop tick.
+# Lower = smoother/slower ramp up. Higher = more aggressive/faster.
+# Only used if ENABLE_SMOOTHING is True.
+SMOOTHING_FACTOR = 0.10  # ✏️ tune  (range: 0.01 – 1.0)
 
 
 # =============================================================================
-# SECTION 2 — NETWORK CONFIGURATION
-# =============================================================================
-# The Pi sends a CSV string of RC channel values over UDP to the ESP32.
-# Format sent: "roll,pitch,throttle,yaw,arm"  e.g. "1500,1700,1600,1500,2000"
-#
-# SIMULATION:  ESP32_IP = "127.0.0.1"   (everything on one computer)
-# REAL HARDWARE (ESP32 SoftAP):  ESP32_IP = "192.168.4.1"
-# REAL HARDWARE (phone hotspot): ESP32_IP = <IP assigned to ESP32 by hotspot>
-#                                 Check your phone's connected-devices list.
-#
-# ✏️  Update ESP32_IP before running on real hardware.
+# SECTION 2 — NETWORK & TELEMETRY CONFIGURATION
 # =============================================================================
 
-ESP32_IP   = "127.0.0.1"   # ✏️  change to "192.168.4.1" for real hardware
-ESP32_PORT = 4210           # must match UDP_PORT in ESP32_Firmware.ino
+ESP32_IP   = "127.0.0.1"   # ✏️  change to ESP32 IP for real hardware
+ESP32_PORT = 4210
 
 _udp_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 
-TELEMETRY_IP = "127.0.0.1"
-TELEMETRY_PORT = 4211
-_telemetry_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+# ---------------------------------------------------------
+# NEW: TEST RUNNER INTEGRATION
+# We stream a unified state object to the Test Runner Script
+# ---------------------------------------------------------
+TEST_RUNNER_IP   = "127.0.0.1"
+TEST_RUNNER_PORT = 4211
+_test_runner_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 
+# Listen for ESP32 Telemetry
+TELEMETRY_PORT = 4212
+_telemetry_rx_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+_telemetry_rx_socket.settimeout(1.0)   # Wake up every second so we can detect silence
+_telemetry_rx_socket.bind(("0.0.0.0", TELEMETRY_PORT))
 
-# =============================================================================
-# SECTION 3 — RC CHANNEL VALUES
-# =============================================================================
-# RC channels are the "language" Betaflight understands. Each value is a
-# number from 1000 to 2000, where 1500 is centre/neutral.
-#
-# These are the current channel values that get sent to the ESP32 every loop.
-# They start in a safe, disarmed state and are modified by apply_command().
-#
-# Channel mapping (matches Betaflight's default layout):
-#   roll     → CH1 → left/right tilt     (1000=full left,  1500=centre, 2000=full right)
-#   pitch    → CH2 → forward/back tilt   (1000=full back,  1500=centre, 2000=full forward)
-#   throttle → CH3 → motor speed         (1000=motors off, 2000=full power)
-#   yaw      → CH4 → rotation            (1000=spin left,  1500=centre, 2000=spin right)
-#   arm      → CH5 → arm/disarm switch   (1000=disarmed,   2000=armed)
-# =============================================================================
+LOG_FILENAME = f"flight_log_{datetime.datetime.now().strftime('%Y%m%d_%H%M%S')}.jsonl"
 
-rc_channels = {
-    "roll":     1500,   # neutral
-    "pitch":    1500,   # neutral
-    "throttle": 1000,   # motors off (safe default)
-    "yaw":      1500,   # neutral
-    "arm":      1000,   # disarmed (safe default)
+# Expanded to hold Attitude, Analog, AND Physical RC Sticks for the Test Runner
+latest_telemetry = {
+    "vbat": 0.0,
+    "current": 0.0,
+    "roll": 0.0,
+    "pitch": 0.0,
+    "yaw": 0.0,
+    "rc_roll": 1500,
+    "rc_pitch": 1500,
+    "rc_throttle": 1000,
+    "rc_yaw": 1500
 }
 
 
 # =============================================================================
-# SECTION 4 — DRONE STATE MACHINE
-# =============================================================================
-# The drone is always in one of two states: GROUNDED or AIRBORNE.
-# This prevents dangerous commands like "move forward" being executed
-# while the drone is still sitting on the ground.
+# SECTION 3 — RC CHANNEL VALUES & DRONE STATE
 # =============================================================================
 
+# The actual values currently sent to the drone over UDP.
+rc_channels = {
+    "roll":     1500.0,
+    "pitch":    1500.0,
+    "throttle": 1000.0,
+    "yaw":      1500.0,   # Tracked for future use
+    "arm":      1000,
+}
+
+# The "desired" values that commands write to. The main loop interpolates
+# rc_channels toward these targets each tick (when smoothing is enabled).
+target_rc_channels = {
+    "roll":     1500.0,
+    "pitch":    1500.0,
+    "throttle": 1000.0,
+    "yaw":      1500.0,
+}
+
 class DroneState(Enum):
-    GROUNDED = "GROUNDED"   # motors off, won't accept movement commands
-    AIRBORNE = "AIRBORNE"   # hovering, accepts movement commands
+    GROUNDED = "GROUNDED"
+    AIRBORNE = "AIRBORNE"
 
 drone_state = DroneState.GROUNDED
 
 
 # =============================================================================
-# SECTION 5 — AVAILABLE COMMANDS
+# SECTION 4 — FREQUENCY-TO-COMMAND MAPPING
 # =============================================================================
+#
+# SSVEP stimulus frequencies and their associated drone commands.
+#
+# KEY DESIGN CONSTRAINT — avoid the alpha band (8–12 Hz):
+#   The occipital cortex produces strong alpha oscillations (~10 Hz) during
+#   rest and eye closure. Stimulus frequencies inside that band risk being
+#   masked by or confused with spontaneous alpha activity.
+#
+#   We therefore keep all frequencies either ABOVE 13 Hz or BELOW 7 Hz,
+#   leaving a clean gap around the 8–12 Hz alpha range.
+#
+# Current layout:
+#   High-band  (>13 Hz) : TAKEOFF 20 Hz | LAND 15 Hz | FORWARD 14 Hz
+#   Low-band   (<7  Hz) : BACKWARD 6 Hz | LEFT 5.5 Hz | RIGHT 5 Hz | STOP 4.5 Hz
+#
+# ✏️ tune — if your display refresh rate or amplifier changes, update these
+#           so that each frequency is an exact integer multiple of your
+#           stimulus frame rate (e.g. 60 / N Hz).
 
 class Command(Enum):
     TAKEOFF  = "TAKEOFF"
@@ -144,73 +140,114 @@ class Command(Enum):
     BACKWARD = "BACKWARD"
     LEFT     = "LEFT"
     RIGHT    = "RIGHT"
-    STOP     = "STOP"   # emergency stop — works from any state
+    STOP     = "STOP"
+
+FREQ_TO_COMMAND = {
+    20.0:  Command.TAKEOFF,   # 60 / 3  — well above alpha band
+    15.0:  Command.LAND,      # 60 / 4  — well above alpha band
+    14.0:  Command.FORWARD,   # 60 / ~4.3 — clear of alpha band
+     6.0:  Command.BACKWARD,  # 60 / 10 — below alpha band
+     5.5:  Command.LEFT,      # 60 / ~10.9 — below alpha band
+     5.0:  Command.RIGHT,     # 60 / 12 — below alpha band
+     4.5:  Command.STOP,      # 60 / ~13.3 — below alpha band
+}
 
 
 # =============================================================================
-# SECTION 6 — SENSOR STATE
-# =============================================================================
-# When a sensor detects a command, it writes to these variables.
-# The main control loop reads them, decides what to do, then clears them.
-#
-# ACTIVE_VOICE_CMD / ACTIVE_EMG_CMD:  the most recent detected command (or None)
-# ACTIVE_VOICE_TIME / ACTIVE_EMG_TIME: when that command was detected
-#
-# Commands older than COMMAND_EXPIRY_SECONDS are discarded automatically,
-# so a missed word or stale gesture doesn't execute seconds later.
+# SECTION 5 — SENSOR STATE
 # =============================================================================
 
-COMMAND_EXPIRY_SECONDS = 1.0
+# A voice or EEG command is discarded if it is older than this many seconds.
+# Prevents stale detections from firing unexpectedly after a delay.
+COMMAND_EXPIRY_SECONDS = 2.5  # ✏️ tune
 
-# Voice sensor state (written by audio_callback, read by main loop)
 active_voice_cmd  = None
-active_voice_time = float('-inf')   # float('-inf') means "never set"
+active_voice_time = float('-inf')
 
-# EMG sensor state (written by emg_polling_thread, read by main loop)
-active_emg_cmd  = None
-active_emg_time = float('-inf')
+active_eeg_cmd  = None
+active_eeg_time = float('-inf')
 
-# Movement tracking (used by auto-stop logic)
 last_movement_time = 0.0
 is_moving          = False
 
+# NEW: Track the live CCA correlation score for the Test Runner graph
+latest_eeg_score = 0.0
+
 
 # =============================================================================
-# SECTION 7 — VOICE RECOGNITION
+# SECTION 6 — TELEMETRY BACKGROUND LISTENER
+# =============================================================================
+
+# How many consecutive silent seconds before we log a warning.
+TELEMETRY_SILENCE_WARN_SECONDS = 5  # ✏️ tune
+
+def telemetry_listener_thread() -> None:
+    print(f"[Telemetry] Listening for Betaflight data on port {TELEMETRY_PORT}...")
+    print(f"[Telemetry] Logging all data to: {LOG_FILENAME}")
+
+    last_rx_time = time.time()
+
+    while True:
+        try:
+            data, _addr = _telemetry_rx_socket.recvfrom(1024)
+            last_rx_time = time.time()
+
+            payload_str  = data.decode("utf-8")
+            telemetry_data = json.loads(payload_str)
+            telemetry_data["system_time"] = time.time()
+
+            if telemetry_data.get("type") == "analog":
+                latest_telemetry["vbat"]    = telemetry_data.get("vbat", 0.0)
+                latest_telemetry["current"] = telemetry_data.get("current", 0.0)
+
+            elif telemetry_data.get("type") == "attitude":
+                latest_telemetry["roll"]  = telemetry_data.get("roll",  0.0)
+                latest_telemetry["pitch"] = telemetry_data.get("pitch", 0.0)
+                latest_telemetry["yaw"]   = telemetry_data.get("yaw", 0.0)
+
+            # NEW: Physical controller stick values mapping!
+            elif telemetry_data.get("type") == "rc":
+                latest_telemetry["rc_roll"]     = telemetry_data.get("roll", 1500)
+                latest_telemetry["rc_pitch"]    = telemetry_data.get("pitch", 1500)
+                latest_telemetry["rc_throttle"] = telemetry_data.get("throttle", 1000)
+                latest_telemetry["rc_yaw"]      = telemetry_data.get("yaw", 1500)
+
+            with open(LOG_FILENAME, "a") as f:
+                f.write(json.dumps(telemetry_data) + "\n")
+
+        except TimeoutError:
+            # Socket woke up with no data — check how long we've been silent.
+            silent_for = time.time() - last_rx_time
+            if silent_for >= TELEMETRY_SILENCE_WARN_SECONDS:
+                print(f"[Telemetry] WARNING: No data received for {silent_for:.0f}s. "
+                      "Check Betaflight MSP bridge.")
+
+        except Exception:
+            pass
+
+
+# =============================================================================
+# SECTION 7 — VOICE RECOGNITION (VOSK)
 # =============================================================================
 
 print("[System] Loading Vosk speech recognition model...")
 _vosk_model = Model("vosk-model-small-en-us-0.15")
-
-# Restrict the recognizer to only these words so it doesn't mishear anything.
-_grammar    = json.dumps([cmd.value.lower() for cmd in Command] + ["take off", "[unk]"])
+_grammar    = json.dumps([cmd.value.lower() for cmd in Command] +["take off", "[unk]"])
 _recognizer = KaldiRecognizer(_vosk_model, 16000, _grammar)
 
-
 def _map_speech_to_command(text: str) -> Command | None:
-    """
-    Convert a recognized speech string into a Command enum value.
-    Returns None if the text doesn't match any known command.
-    """
     text = text.lower().strip()
     if "take off" in text or "takeoff" in text: return Command.TAKEOFF
-    if "land"     in text:                       return Command.LAND
-    if "forward"  in text:                       return Command.FORWARD
-    if "backward" in text:                       return Command.BACKWARD
-    if "left"     in text:                       return Command.LEFT
-    if "right"    in text:                       return Command.RIGHT
-    if "stop"     in text:                       return Command.STOP
+    if "land"     in text:                      return Command.LAND
+    if "forward"  in text:                      return Command.FORWARD
+    if "backward" in text:                      return Command.BACKWARD
+    if "left"     in text:                      return Command.LEFT
+    if "right"    in text:                      return Command.RIGHT
+    if "stop"     in text:                      return Command.STOP
     return None
 
-
 def audio_callback(indata, _frames, _time_info, _status) -> None:
-    """
-    Called automatically by sounddevice every time a new audio chunk arrives.
-    Feeds audio into Vosk and updates active_voice_cmd if a command is heard.
-    This runs in a background thread — do not call it directly.
-    """
     global active_voice_cmd, active_voice_time
-
     if _recognizer.AcceptWaveform(bytes(indata)):
         result = json.loads(_recognizer.Result())
         text   = result.get("text", "").strip()
@@ -223,268 +260,450 @@ def audio_callback(indata, _frames, _time_info, _status) -> None:
 
 
 # =============================================================================
-# SECTION 8 — EMG SENSOR
-# =============================================================================
-# ✏️  THIS SECTION NEEDS TO BE FILLED IN before EMG mode will work.
-#
-# Replace the body of the while loop below with code that:
-#   1. Reads a signal from your EMG sensor (e.g. via GPIO, SPI, or serial)
-#   2. Classifies the gesture into one of the Command enum values
-#   3. Sets active_emg_cmd and active_emg_time, exactly like audio_callback does
-#
-# Example structure once you have sensor reading working:
-#
-#   raw_signal = read_emg_sensor()          # your sensor read call here
-#   gesture    = classify_gesture(raw_signal)  # your classification logic here
-#   if gesture:
-#       active_emg_cmd  = gesture
-#       active_emg_time = time.time()
-#       print(f"[EMG] Detected gesture → {gesture.value}")
+# SECTION 8 — EEG BRAINWAVE PROCESSING (SSVEP + CCA)
 # =============================================================================
 
-def emg_polling_thread() -> None:
+# --- 8a. EEG signal processing parameters ---
+
+# Occipital channel indices in the OpenBCI data stream (0-based).
+# Adjust to match your headset's electrode layout.
+OCCIPITAL_INDICES = [5, 6, 7]  # ✏️ tune — depends on headset/cap layout
+
+# Length of the EEG window fed into CCA each iteration.
+# Longer window → better frequency resolution, more latency.
+WINDOW_SECONDS = 2.0  # ✏️ tune  (seconds)
+
+# Fraction of the window to advance after a successful detection.
+# Smaller overlap = more responsive but more CPU.
+WINDOW_STEP_FRACTION = 0.5  # ✏️ tune  (0.0 – 1.0, fraction of window length)
+
+# Minimum CCA canonical correlation to accept a frequency as a real SSVEP signal.
+# Too low → false positives from noise. Too high → missed detections.
+CONFIDENCE_THRESHOLD = 0.50  # ✏️ tune  (range: 0.0 – 1.0)
+
+# Number of harmonics included in the CCA reference signals.
+# More harmonics = richer template, better detection, slightly more CPU.
+NUM_HARMONICS = 3  # ✏️ tune
+
+# --- 8b. Preprocessing filter parameters ---
+#
+# Pipeline order: detrend → notch (60 Hz) → bandpass → CAR → CCA
+#
+# Bandpass bounds are chosen to cover all SSVEP stimulus frequencies
+# (currently 4.5–20 Hz) with margin, while excluding:
+#   • DC drift and slow movement artefacts  (below 4 Hz)
+#   • High-frequency muscle/line noise      (above 30 Hz)
+#   • Alpha band (8–12 Hz) is NOT excluded here — we avoid it
+#     at the stimulus-frequency selection level (Section 4).
+#
+BANDPASS_LOW_HZ  =  6.0   # ✏️ tune — lower bound; must be below lowest stimulus freq
+BANDPASS_HIGH_HZ = 30.0   # ✏️ tune — upper bound; must be above highest stimulus freq
+BANDPASS_ORDER   =  4     # ✏️ tune — Butterworth filter order (higher = sharper rolloff)
+
+# Powerline notch frequency. Use 60 Hz (Americas/Japan) or 50 Hz (Europe/Asia).
+NOTCH_FREQ_HZ = 60.0   # ✏️ tune — 60 for US/Canada, 50 for Europe/Asia
+NOTCH_Q       = 30.0   # ✏️ tune — quality factor; higher = narrower notch
+
+
+def _build_filters(sample_rate: float) -> tuple[np.ndarray, np.ndarray]:
     """
-    Runs in a background thread, continuously polling the EMG sensor.
-    Currently a placeholder — see Section 8 above for what to fill in.
+    Pre-compute and return the bandpass and notch filter coefficients.
+    Called once when the EEG stream is connected, not on every window.
+    Returns (bandpass_sos, notch_sos).
     """
-    global active_emg_cmd, active_emg_time
+    nyq = sample_rate / 2.0
+
+    # Butterworth bandpass as second-order sections (SOS) for numerical stability.
+    bandpass_sos = butter(
+        BANDPASS_ORDER,[BANDPASS_LOW_HZ / nyq, BANDPASS_HIGH_HZ / nyq],
+        btype="band",
+        output="sos",
+    )
+
+    # IIR notch to suppress powerline interference.
+    b_notch, a_notch = iirnotch(NOTCH_FREQ_HZ / nyq, NOTCH_Q)
+    # Convert ba → sos for consistent filtering interface.
+    from scipy.signal import tf2sos
+    notch_sos = tf2sos(b_notch, a_notch)
+
+    return bandpass_sos, notch_sos
+
+
+def preprocess_eeg_window(
+    eeg_data: np.ndarray,
+    bandpass_sos: np.ndarray,
+    notch_sos: np.ndarray,
+) -> np.ndarray:
+    """
+    Apply the full preprocessing pipeline to a raw EEG window.
+
+    Pipeline:
+      1. Baseline detrend  — removes linear drift / DC offset per channel.
+      2. Notch filter      — suppresses powerline interference (60 Hz by default).
+      3. Bandpass filter   — passes only the SSVEP-relevant frequency range.
+      4. Common Average Reference (CAR) — subtracts the mean across channels
+                                          sample-by-sample to cancel noise
+                                          common to all electrodes.
+
+    Parameters
+    ----------
+    eeg_data     : (samples x channels) raw EEG array
+    bandpass_sos : pre-built bandpass SOS coefficients
+    notch_sos    : pre-built notch SOS coefficients
+
+    Returns
+    -------
+    cleaned : (samples x channels) preprocessed array
+    """
+    # 1. Detrend: remove linear trend per channel (axis=0 operates per column).
+    cleaned = detrend(eeg_data, axis=0)
+
+    # 2. Notch filter: zero-phase to avoid phase distortion on SSVEP signals.
+    cleaned = sosfiltfilt(notch_sos, cleaned, axis=0)
+
+    # 3. Bandpass filter: zero-phase Butterworth.
+    cleaned = sosfiltfilt(bandpass_sos, cleaned, axis=0)
+
+    # 4. Common Average Reference: subtract the instantaneous mean across channels.
+    #    This suppresses noise that appears identically on every electrode
+    #    (e.g. movement artefacts, power fluctuations).
+    cleaned = cleaned - cleaned.mean(axis=1, keepdims=True)
+
+    return cleaned
+
+
+# --- 8c. SSVEP / CCA analysis ---
+
+def _generate_reference_signals(
+    length: int,
+    sample_rate: float,
+    target_freq: float,
+) -> np.ndarray:
+    """
+    Build the sinusoidal reference matrix for a given stimulus frequency.
+    Includes NUM_HARMONICS sine/cosine pairs → shape (length, 2*NUM_HARMONICS).
+    """
+    t = np.arange(length) / sample_rate
+    refs =[]
+    for h in range(1, NUM_HARMONICS + 1):
+        refs.append(np.sin(2 * np.pi * h * target_freq * t))
+        refs.append(np.cos(2 * np.pi * h * target_freq * t))
+    return np.array(refs).T
+
+
+def analyze_ssvep_window(
+    eeg_data: np.ndarray,
+    sample_rate: float,
+) -> tuple[float | None, float]:
+    """
+    Run CCA against reference signals for every candidate frequency and
+    return the best match if it clears CONFIDENCE_THRESHOLD.
+
+    Parameters
+    ----------
+    eeg_data    : preprocessed (samples × channels) EEG array
+    sample_rate : sampling rate in Hz
+
+    Returns
+    -------
+    (best_freq, score) — best_freq is None if no candidate clears the threshold.
+    """
+    global latest_eeg_score
+    samples = eeg_data.shape[0]
+    best_freq  = None
+    best_score = 0.0
+
+    for freq in FREQ_TO_COMMAND:
+        y_ref = _generate_reference_signals(samples, sample_rate, freq)
+
+        cca = CCA(n_components=1)
+        cca.fit(eeg_data, y_ref)
+        X_c, Y_c = cca.transform(eeg_data, y_ref)
+
+        # Canonical correlation between the first component pair.
+        score = float(np.corrcoef(X_c[:, 0], Y_c[:, 0])[0, 1])
+
+        if score > best_score:
+            best_score = score
+            best_freq  = freq
+
+    # ALWAYS update the global score so the Test Runner can graph it continuously
+    latest_eeg_score = best_score
+
+    if best_score >= CONFIDENCE_THRESHOLD:
+        return best_freq, best_score
+
+    return None, best_score
+
+
+# --- 8d. EEG polling thread ---
+
+def eeg_polling_thread() -> None:
+    """
+    Continuously resolves an OpenBCI LSL stream (retrying indefinitely),
+    buffers incoming samples, and feeds rolling windows into the SSVEP
+    pipeline. Updates active_eeg_cmd when a command is detected.
+    """
+    global active_eeg_cmd, active_eeg_time
+
+    # Retry loop — keeps looking until the OpenBCI GUI starts broadcasting.
+    inlet = None
+    while inlet is None:
+        print("[EEG] Looking for OpenBCI LSL stream on the local network...")
+        streams = resolve_byprop('type', 'EEG', timeout=5.0)
+
+        if streams:
+            inlet = StreamInlet(streams[0])
+        else:
+            print("[EEG] Stream not found. Retrying in 5 seconds... "
+                  "(ensure OpenBCI GUI is broadcasting)")
+            time.sleep(5)
+
+    srate          = inlet.info().nominal_srate() or 250.0  # ✏️ tune fallback if auto-detect fails
+    window_samples = int(srate * WINDOW_SECONDS)
+    step_samples   = int(srate * WINDOW_SECONDS * WINDOW_STEP_FRACTION)
+    data_buffer    =[]
+
+    # Build filters once — avoids repeated coefficient computation per window.
+    bandpass_sos, notch_sos = _build_filters(srate)
+
+    print(f"[EEG] Connected! Sample rate: {srate:.0f} Hz | "
+          f"Window: {WINDOW_SECONDS}s ({window_samples} samples) | "
+          f"Step: {step_samples} samples")
 
     while True:
-        # ✏️  Replace this with real EMG sensor reading + gesture classification
-        time.sleep(0.05)   # poll at 20Hz — adjust to match your sensor's sample rate
+        chunk, _timestamps = inlet.pull_chunk(timeout=0.1, max_samples=window_samples)
+        if chunk:
+            for sample in chunk:
+                occipital_data = [sample[i] for i in OCCIPITAL_INDICES]
+                data_buffer.append(occipital_data)
+
+        if len(data_buffer) >= window_samples:
+            # Trim buffer to the most recent window.
+            data_buffer = data_buffer[-window_samples:]
+            eeg_window  = np.array(data_buffer, dtype=np.float64)
+
+            # Full preprocessing before CCA.
+            eeg_clean = preprocess_eeg_window(eeg_window, bandpass_sos, notch_sos)
+
+            best_freq, score = analyze_ssvep_window(eeg_clean, srate)
+
+            if best_freq is not None:
+                # Direct dict lookup — best_freq is already a key in FREQ_TO_COMMAND.
+                cmd = FREQ_TO_COMMAND[best_freq]
+                print(f"[EEG] Detected: {best_freq:>5.2f} Hz  "
+                      f"(Score: {score:.3f})  →  {cmd.value}")
+                active_eeg_cmd  = cmd
+                active_eeg_time = time.time()
+
+                # Advance by one step so the next window has fresh data.
+                data_buffer = data_buffer[step_samples:]
+
+        time.sleep(0.01)
 
 
 # =============================================================================
-# SECTION 9 — RC CHANNEL HELPERS
+# SECTION 9 — COMMAND EXECUTION & CALIBRATION VALUES
 # =============================================================================
 
 def _set_neutral_movement() -> None:
-    """Return pitch and roll to centre (1500), putting the drone into a stable hover."""
-    rc_channels["pitch"] = 1500
-    rc_channels["roll"]  = 1500
-
+    """Return pitch and roll targets to hover-neutral (1500 µs)."""
+    target_rc_channels["pitch"] = 1500.0
+    target_rc_channels["roll"]  = 1500.0
 
 def _disarm() -> None:
     """
-    Cut throttle and disarm. Safe to call at any time.
-    The drone will drop if airborne — only call this for landing or emergency stop.
+    Emergency disarm — bypasses smoothing and writes directly to rc_channels
+    so the drone stops immediately regardless of any pending targets.
     """
-    rc_channels["throttle"] = 1000
-    rc_channels["arm"]      = 1000
+    rc_channels["throttle"]        = 1000.0
+    target_rc_channels["throttle"] = 1000.0
+    rc_channels["arm"]             = 1000
+
     _set_neutral_movement()
-
-
-# =============================================================================
-# SECTION 10 — COMMAND EXECUTION
-# =============================================================================
-# Translates a Command enum value into actual RC channel values.
-#
-# ✏️  TUNING THESE VALUES is the most important step on real hardware.
-#     Use the rc_sniffer.js tool while flying with your physical Radiomaster
-#     controller to find what values actually produce the behaviour you want,
-#     then replace the numbers below.
-#
-# Current values are reasonable estimates for a 5" drone on 6S:
-#   Takeoff throttle 1600 ≈ 50% throttle — likely too high, probably closer to 1400
-#   Forward/back pitch  ±200 from centre — may need to be smaller (±100) indoors
-#   Left/right roll     ±200 from centre — same, tune for your space
-# =============================================================================
+    # Also write directly so there is no interpolation lag on disarm.
+    rc_channels["pitch"] = 1500.0
+    rc_channels["roll"]  = 1500.0
 
 def apply_command(command: Command) -> None:
     global is_moving, last_movement_time, drone_state
 
-    # ------------------------------------------------------------------
-    # EMERGENCY STOP
-    # Bypasses all state checks. Immediately disarms from any state.
-    # Triggered by saying "stop" from either sensor.
-    # ------------------------------------------------------------------
+    vbat    = latest_telemetry["vbat"]
+    vbat_str = f"[{vbat:.1f}V]" if vbat > 0 else "[No VBat]"
+
+    # STOP is always processed, regardless of drone state.
     if command is Command.STOP:
-        print("\n[EMERGENCY STOP] Disarming immediately.")
+        print(f"\n{vbat_str} [EMERGENCY STOP] Disarming immediately.")
         _disarm()
         is_moving   = False
         drone_state = DroneState.GROUNDED
         return
 
-    # ------------------------------------------------------------------
-    # GROUNDED — only TAKEOFF is accepted
-    # ------------------------------------------------------------------
     if drone_state is DroneState.GROUNDED:
-
         if command is not Command.TAKEOFF:
-            print(f"[BLOCKED] Drone is grounded. Say 'take off' first. (Ignored: {command.value})")
+            print(f"{vbat_str} [BLOCKED] Drone is grounded. "
+                  f"Execute 'take off' first. (Ignored: {command.value})")
             return
 
-        print("\n[TAKEOFF] Arming and climbing to hover.")
-        rc_channels["arm"]      = 2000   # arm switch ON
-        rc_channels["throttle"] = 1600   # ✏️  tune: real hover throttle is likely 1350–1450
+        print(f"\n{vbat_str} [TAKEOFF] Arming and spooling up motors.")
+        rc_channels["arm"] = 2000
+
+        # ✏️ PASTE "throttle_hover" value from Calibration Script here:
+        target_rc_channels["throttle"] = 1600.0
+
         drone_state = DroneState.AIRBORNE
 
-    # ------------------------------------------------------------------
-    # AIRBORNE — movement and landing commands accepted
-    # ------------------------------------------------------------------
     elif drone_state is DroneState.AIRBORNE:
-
         if command is Command.TAKEOFF:
             print("[IGNORED] Already airborne.")
             return
 
         if command is Command.LAND:
-            print("\n[LAND] Disarming and landing.")
+            print(f"\n{vbat_str} [LAND] Disarming and landing.")
             _disarm()
             is_moving   = False
             drone_state = DroneState.GROUNDED
             return
 
-        # Directional commands — move for ACTION_DURATION then auto-return to hover
-        print(f"[MOVE] {command.value}")
+        print(f"{vbat_str} [MOVE] {command.value}")
 
+        # ✏️ PASTE values from Calibration Script here:
         if command is Command.FORWARD:
-            rc_channels["pitch"] = 1600   # ✏️  tune: push forward gently, try 1550 first indoors
+            target_rc_channels["pitch"] = 1600.0
         elif command is Command.BACKWARD:
-            rc_channels["pitch"] = 1400   # ✏️  tune: same, opposite direction
+            target_rc_channels["pitch"] = 1400.0
         elif command is Command.LEFT:
-            rc_channels["roll"]  = 1400   # ✏️  tune
+            target_rc_channels["roll"]  = 1400.0
         elif command is Command.RIGHT:
-            rc_channels["roll"]  = 1600   # ✏️  tune
+            target_rc_channels["roll"]  = 1600.0
 
         last_movement_time = time.time()
         is_moving          = True
 
 
 # =============================================================================
-# SECTION 11 — MAIN CONTROL LOOP
-# =============================================================================
-# Runs at 50Hz (every 20ms). Each iteration:
-#   1. Expires stale sensor commands
-#   2. Decides which command to execute based on EXPERIMENT_MODE
-#   3. Applies the command (updates rc_channels)
-#   4. Auto-stops directional movement after ACTION_DURATION
-#   5. Sends the current rc_channels to the ESP32 over UDP
+# SECTION 10 — MAIN CONTROL LOOP & TEST RUNNER BROADCAST
 # =============================================================================
 
 def main_control_loop() -> None:
-    global active_voice_cmd, active_emg_cmd, is_moving
+    global active_voice_cmd, active_eeg_cmd, is_moving
 
     print(f"\n[Control Loop] Running in {EXPERIMENT_MODE.value} mode.")
-    print(f"[Control Loop] Sending UDP to {ESP32_IP}:{ESP32_PORT} at 50Hz.")
-    print("[State] Drone is GROUNDED and disarmed. Say 'take off' to begin.\n")
+    print(f"[Control Loop] Sending UDP to ESP32 at {ESP32_IP}:{ESP32_PORT}")
+    print(f"[Control Loop] Forwarding Telemetry to Test Runner at {TEST_RUNNER_IP}:{TEST_RUNNER_PORT}")
+    smooth_str = "ON" if ENABLE_SMOOTHING else "OFF (Instant)"
+    print(f"[Control Loop] Movement smoothing: {smooth_str}")
+    print("[State] Drone is GROUNDED and disarmed. Trigger TAKEOFF to begin.\n")
 
     while True:
         now = time.time()
 
-        # ------------------------------------------------------------------
-        # STEP 1: Expire stale commands
-        # If a command was detected more than COMMAND_EXPIRY_SECONDS ago,
-        # clear it so it doesn't execute late.
-        # ------------------------------------------------------------------
+        # STEP 1: Expire stale commands — prevents old detections from firing late.
         if now - active_voice_time > COMMAND_EXPIRY_SECONDS:
             active_voice_cmd = None
-        if now - active_emg_time > COMMAND_EXPIRY_SECONDS:
-            active_emg_cmd = None
+        if now - active_eeg_time > COMMAND_EXPIRY_SECONDS:
+            active_eeg_cmd = None
 
-        # ------------------------------------------------------------------
-        # STEP 2: Decide which command to execute
-        # ------------------------------------------------------------------
+        # STEP 2: Decide which command to execute based on experiment mode.
         final_cmd = None
 
-        # Emergency stop takes absolute priority over everything
-        if active_voice_cmd is Command.STOP or active_emg_cmd is Command.STOP:
-            final_cmd         = Command.STOP
-            active_voice_cmd  = None
-            active_emg_cmd    = None
+        # STOP is a special case: either sensor alone can trigger an emergency stop.
+        if active_voice_cmd is Command.STOP or active_eeg_cmd is Command.STOP:
+            final_cmd        = Command.STOP
+            active_voice_cmd = None
+            active_eeg_cmd   = None
 
         elif EXPERIMENT_MODE is ExperimentMode.VOICE_ONLY:
             if active_voice_cmd:
                 final_cmd        = active_voice_cmd
                 active_voice_cmd = None
 
-        elif EXPERIMENT_MODE is ExperimentMode.EMG_ONLY:
-            if active_emg_cmd:
-                final_cmd      = active_emg_cmd
-                active_emg_cmd = None
+        elif EXPERIMENT_MODE is ExperimentMode.EEG_ONLY:
+            if active_eeg_cmd:
+                final_cmd      = active_eeg_cmd
+                active_eeg_cmd = None
 
         elif EXPERIMENT_MODE is ExperimentMode.BOTH:
-            # Both sensors must agree on the same command for it to execute.
-            # If they disagree, both are discarded and nothing happens.
-            if active_voice_cmd and active_emg_cmd:
-                if active_voice_cmd is active_emg_cmd:
+            # Fusion mode: both sensors must independently agree on the same
+            # command before it is executed. This reduces false positives from
+            # either channel acting alone.
+            if active_voice_cmd and active_eeg_cmd:
+                if active_voice_cmd is active_eeg_cmd:
                     print(f"[FUSION] Both sensors agree: {active_voice_cmd.value} → executing.")
                     final_cmd = active_voice_cmd
                 else:
-                    print(f"[FUSION] Sensors disagree — Voice: {active_voice_cmd.value} | EMG: {active_emg_cmd.value} → ignoring.")
-                active_voice_cmd = None
-                active_emg_cmd   = None
+                    print(f"[FUSION] Sensors disagree — "
+                          f"Voice: {active_voice_cmd.value} | "
+                          f"EEG: {active_eeg_cmd.value} → ignoring.")
 
-        # ------------------------------------------------------------------
-        # STEP 3: Apply the decided command
-        # ------------------------------------------------------------------
+                active_voice_cmd = None
+                active_eeg_cmd   = None
+
+        # STEP 3: Apply the decided command (writes to target_rc_channels).
         if final_cmd:
             apply_command(final_cmd)
 
-        # ------------------------------------------------------------------
-        # STEP 4: Auto-stop directional movement after ACTION_DURATION
-        # Returns pitch and roll to neutral so the drone hovers in place.
-        # ------------------------------------------------------------------
+        # STEP 4: Auto-stop directional movement after ACTION_DURATION seconds.
         if is_moving and (now - last_movement_time > ACTION_DURATION):
             print("[AUTO-STOP] Returning to neutral hover.")
             _set_neutral_movement()
             is_moving = False
 
-        # ------------------------------------------------------------------
-        # STEP 5: Send current channel values to ESP32 over UDP
-        # Format: "roll,pitch,throttle,yaw,arm"
-        # The ESP32 encodes this into an MSP packet and forwards to Betaflight.
-        # ------------------------------------------------------------------
-        payload = (
-            f"{rc_channels['roll']},"
-            f"{rc_channels['pitch']},"
-            f"{rc_channels['throttle']},"
-            f"{rc_channels['yaw']},"
-            f"{rc_channels['arm']}"
-        )
-        _udp_socket.sendto(payload.encode("utf-8"), (ESP32_IP, ESP32_PORT))
+        # STEP 5: Interpolate actual RC values toward targets (smoothing).
+        #         Emergency disarm bypasses this by writing rc_channels directly.
+        for axis in ["roll", "pitch", "throttle", "yaw"]:
+            if ENABLE_SMOOTHING:
+                diff = target_rc_channels[axis] - rc_channels[axis]
+                rc_channels[axis] += diff * SMOOTHING_FACTOR
+            else:
+                rc_channels[axis] = target_rc_channels[axis]
 
-        # --- TELEMETRY FOR TEST RUNNER ---
-        telemetry = {
-            "timestamp": now,
-            "mode": EXPERIMENT_MODE.value,
+        # STEP 6: Transmit current channel values to the ESP32 over UDP.
+        if EXPERIMENT_MODE is not ExperimentMode.PHYSICAL_RC:
+            esp32_payload = (
+                f"{int(rc_channels['roll'])},"
+                f"{int(rc_channels['pitch'])},"
+                f"{int(rc_channels['throttle'])},"
+                f"{int(rc_channels['yaw'])},"
+                f"{rc_channels['arm']}"
+            )
+            _udp_socket.sendto(esp32_payload.encode("utf-8"), (ESP32_IP, ESP32_PORT))
+
+        # STEP 7: Broadcast Unified State to the Test Runner Script
+        runner_payload = {
             "state": drone_state.value,
             "voice_cmd": active_voice_cmd.value if active_voice_cmd else None,
-            "emg_cmd": active_emg_cmd.value if active_emg_cmd else None,
+            "eeg_cmd": active_eeg_cmd.value if active_eeg_cmd else None,
             "final_cmd": final_cmd.value if final_cmd else None,
             "is_moving": is_moving,
-            "rc_channels": rc_channels
+            "eeg_score": latest_eeg_score,
+            "rc_channels": rc_channels,          # What the script is sending to the drone
+            "fc_telemetry": latest_telemetry     # Live data from the drone (Angles, Battery, Physical Sticks)
         }
-        try:
-            _telemetry_socket.sendto(json.dumps(telemetry).encode("utf-8"), (TELEMETRY_IP, TELEMETRY_PORT))
-        except Exception:
-            pass
+        _test_runner_socket.sendto(json.dumps(runner_payload).encode("utf-8"), (TEST_RUNNER_IP, TEST_RUNNER_PORT))
 
-        time.sleep(0.02)   # 50Hz — do not change, the ESP32 and FC expect this rate
+        time.sleep(0.02)   # 50 Hz loop rate
 
 
 # =============================================================================
-# SECTION 12 — ENTRY POINT
+# SECTION 11 — ENTRY POINT
 # =============================================================================
 
 if __name__ == "__main__":
     print("=" * 60)
-    print(f"  Drone Voice Control — {EXPERIMENT_MODE.value} MODE")
+    print(f"  Drone Ground Control — {EXPERIMENT_MODE.value} MODE")
     print(f"  Target: {ESP32_IP}:{ESP32_PORT}")
     print("=" * 60)
 
-    # Start the EMG polling thread (runs in background, does nothing until
-    # you fill in emg_polling_thread() in Section 8)
-    threading.Thread(target=emg_polling_thread, daemon=True).start()
+    threading.Thread(target=eeg_polling_thread,       daemon=True).start()
+    threading.Thread(target=telemetry_listener_thread, daemon=True).start()
 
-    # Start the microphone stream and run the main loop.
-    # sounddevice calls audio_callback() automatically whenever new audio arrives.
     try:
         with sd.RawInputStream(
-            samplerate=16000,   # Vosk requires 16kHz
-            blocksize=8000,     # process audio in ~0.5s chunks
+            samplerate=16000,
+            blocksize=8000,
             dtype="int16",
-            channels=1,         # mono microphone
+            channels=1,
             callback=audio_callback,
         ):
             main_control_loop()
@@ -492,3 +711,11 @@ if __name__ == "__main__":
     except KeyboardInterrupt:
         print("\n[System] Ctrl+C received — shutting down.")
         _disarm()
+        payload = (
+            f"{int(rc_channels['roll'])},"
+            f"{int(rc_channels['pitch'])},"
+            f"{int(rc_channels['throttle'])},"
+            f"{int(rc_channels['yaw'])},"
+            f"{rc_channels['arm']}"
+        )
+        _udp_socket.sendto(payload.encode("utf-8"), (ESP32_IP, ESP32_PORT))

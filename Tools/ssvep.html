@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="dark">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,17 +8,40 @@
   @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Rajdhani:wght@300;400;600;700&display=swap');
 
   :root {
-    --bg: #080c10;
-    --surface: #0d1520;
-    --border: #1a2a3a;
-    --accent: #00e5ff;
-    --accent2: #ff6b35;
-    --accent3: #7fff00;
-    --text: #c8dae8;
-    --text-dim: #4a6a7a;
-    --danger: #ff3355;
     --mono: 'Share Tech Mono', monospace;
     --sans: 'Rajdhani', sans-serif;
+  }
+
+  [data-theme="dark"] {
+    --bg:       #080c10;
+    --surface:  #0d1520;
+    --surface2: #111d2c;
+    --border:   #1a2a3a;
+    --border2:  #243444;
+    --accent:   #00e5ff;
+    --accent2:  #ff6b35;
+    --text:     #c8dae8;
+    --text-dim: #4a6a7a;
+    --danger:   #ff3355;
+    --success:  #00e676;
+    --preview-bg: #000;
+    --preview-box-bg: rgba(255,255,255,0.06);
+  }
+
+  [data-theme="light"] {
+    --bg:       #eef2f6;
+    --surface:  #ffffff;
+    --surface2: #e0e8f0;
+    --border:   #c0ccd8;
+    --border2:  #a8bac8;
+    --accent:   #006fa8;
+    --accent2:  #c04a00;
+    --text:     #142030;
+    --text-dim: #5a7888;
+    --danger:   #bb1133;
+    --success:  #006633;
+    --preview-bg: #111;
+    --preview-box-bg: rgba(255,255,255,0.12);
   }
 
   * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -29,379 +52,374 @@
     font-family: var(--sans);
     min-height: 100vh;
     overflow-x: hidden;
+    transition: background 0.22s, color 0.22s;
   }
 
-  /* ── SETUP PAGE ── */
-  #setup-page {
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
-  }
+  /* ── HEADER ── */
+  #setup-page { min-height: 100vh; display: flex; flex-direction: column; }
 
   .header {
-    padding: 28px 40px 20px;
+    padding: 18px 32px;
     border-bottom: 1px solid var(--border);
     display: flex;
-    align-items: baseline;
-    gap: 16px;
+    align-items: center;
+    gap: 14px;
+    background: var(--surface);
+    transition: background 0.22s;
   }
 
   .header h1 {
     font-family: var(--mono);
-    font-size: 1.1rem;
+    font-size: 1.05rem;
     color: var(--accent);
-    letter-spacing: 0.15em;
+    letter-spacing: 0.14em;
     text-transform: uppercase;
+    white-space: nowrap;
   }
 
-  .header p {
-    font-size: 0.85rem;
+  .header p { font-size: 0.8rem; color: var(--text-dim); letter-spacing: 0.04em; }
+
+  /* ── THEME TOGGLE ── */
+  .theme-toggle {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    margin-left: auto;
+    cursor: pointer;
+    border: 1px solid var(--border);
+    padding: 6px 14px;
+    background: var(--surface2);
+    transition: all 0.2s;
+    font-family: var(--mono);
+    font-size: 0.68rem;
     color: var(--text-dim);
-    letter-spacing: 0.05em;
+    letter-spacing: 0.1em;
+    user-select: none;
+    white-space: nowrap;
   }
+  .theme-toggle:hover { border-color: var(--accent); color: var(--accent); }
 
+  .toggle-track {
+    width: 30px; height: 15px;
+    background: var(--border2);
+    border-radius: 8px;
+    position: relative;
+    transition: background 0.2s;
+    flex-shrink: 0;
+  }
+  [data-theme="light"] .toggle-track { background: var(--accent); }
+
+  .toggle-thumb {
+    width: 11px; height: 11px;
+    background: var(--text-dim);
+    border-radius: 50%;
+    position: absolute;
+    top: 2px; left: 2px;
+    transition: transform 0.2s, background 0.2s;
+  }
+  [data-theme="light"] .toggle-thumb { transform: translateX(15px); background: #fff; }
+
+  /* ── BODY GRID ── */
   .setup-body {
     flex: 1;
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 0;
   }
 
   .setup-left {
-    padding: 36px 40px;
+    padding: 26px 30px;
     border-right: 1px solid var(--border);
     display: flex;
     flex-direction: column;
-    gap: 28px;
+    gap: 22px;
+    overflow-y: auto;
+    max-height: calc(100vh - 118px);
   }
 
   .setup-right {
-    padding: 36px 40px;
+    padding: 26px 30px;
     display: flex;
     flex-direction: column;
-    gap: 24px;
+    gap: 18px;
+    overflow-y: auto;
+    max-height: calc(100vh - 118px);
   }
 
+  .setup-left::-webkit-scrollbar,
+  .setup-right::-webkit-scrollbar { width: 3px; }
+  .setup-left::-webkit-scrollbar-thumb,
+  .setup-right::-webkit-scrollbar-thumb { background: var(--border2); }
+
+  /* ── TYPOGRAPHY / FORM ── */
   .section-label {
     font-family: var(--mono);
-    font-size: 0.7rem;
+    font-size: 0.67rem;
     color: var(--accent);
     letter-spacing: 0.2em;
     text-transform: uppercase;
-    margin-bottom: 14px;
+    margin-bottom: 11px;
     display: flex;
     align-items: center;
     gap: 10px;
   }
+  .section-label::after { content:''; flex:1; height:1px; background:var(--border); }
 
-  .section-label::after {
-    content: '';
-    flex: 1;
-    height: 1px;
-    background: var(--border);
-  }
-
-  .control-row {
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
-    margin-bottom: 16px;
-  }
-
-  .control-row label {
-    font-size: 0.8rem;
-    color: var(--text-dim);
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-  }
-
-  .control-row .value-display {
-    font-family: var(--mono);
-    font-size: 0.9rem;
-    color: var(--accent);
-  }
-
-  input[type=range] {
-    -webkit-appearance: none;
-    width: 100%;
-    height: 2px;
-    background: var(--border);
-    outline: none;
-    border-radius: 0;
-  }
-
-  input[type=range]::-webkit-slider-thumb {
-    -webkit-appearance: none;
-    width: 14px;
-    height: 14px;
-    background: var(--accent);
-    cursor: pointer;
-    border-radius: 0;
-    clip-path: polygon(50% 0%, 100% 100%, 0% 100%);
-    transform: rotate(180deg);
-  }
+  .control-row { display: flex; flex-direction: column; gap: 5px; margin-bottom: 12px; }
+  .control-row label { font-size: 0.73rem; color: var(--text-dim); letter-spacing: 0.07em; text-transform: uppercase; }
 
   input[type=number], input[type=text], select {
     background: var(--surface);
     border: 1px solid var(--border);
     color: var(--text);
     font-family: var(--mono);
-    font-size: 0.9rem;
-    padding: 8px 12px;
+    font-size: 0.84rem;
+    padding: 7px 10px;
     outline: none;
     width: 100%;
-    transition: border-color 0.2s;
+    transition: border-color 0.18s, background 0.18s;
   }
+  input[type=number]:focus, input[type=text]:focus, select:focus { border-color: var(--accent); }
+  select option { background: var(--surface); color: var(--text); }
 
-  input[type=number]:focus, select:focus {
-    border-color: var(--accent);
+  /* ── LABEL SETTINGS GRID ── */
+  .label-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .label-grid .control-row { margin-bottom: 0; }
+
+  /* ── FREQUENCY ROWS ── */
+  .freq-section { display: flex; flex-direction: column; gap: 7px; }
+
+  .freq-toggle-grid {
+    display: flex; flex-direction: column; gap: 5px;
+    max-height: 280px; overflow-y: auto; padding-right: 2px;
   }
+  .freq-toggle-grid::-webkit-scrollbar { width: 3px; }
+  .freq-toggle-grid::-webkit-scrollbar-thumb { background: var(--border2); }
 
-  select option { background: var(--surface); }
-
-  /* ── BOX CONFIG CARDS ── */
-  #box-list {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-    max-height: 60vh;
-    overflow-y: auto;
-    padding-right: 4px;
-  }
-
-  #box-list::-webkit-scrollbar { width: 3px; }
-  #box-list::-webkit-scrollbar-track { background: transparent; }
-  #box-list::-webkit-scrollbar-thumb { background: var(--border); }
-
-  .box-card {
+  .freq-row {
+    display: grid;
+    grid-template-columns: 76px 6px 1fr auto auto;
+    align-items: center;
+    gap: 7px;
     background: var(--surface);
     border: 1px solid var(--border);
-    padding: 14px 16px;
-    display: grid;
-    grid-template-columns: 1fr 1fr 1fr 1fr auto;
-    gap: 10px;
-    align-items: end;
-    position: relative;
-    transition: border-color 0.2s;
+    padding: 7px 10px;
+    transition: opacity 0.2s;
   }
+  .freq-row.disabled { opacity: 0.35; }
+  .freq-hz { font-family: var(--mono); font-size: 0.88rem; color: var(--accent); }
+  .freq-row.disabled .freq-hz { color: var(--text-dim); }
 
-  .box-card:hover { border-color: #2a3a4a; }
-
-  .box-card .card-label {
-    font-family: var(--mono);
-    font-size: 0.65rem;
-    color: var(--text-dim);
-    text-transform: uppercase;
-    letter-spacing: 0.1em;
-    margin-bottom: 5px;
+  .freq-color-dot {
+    width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0;
+    transition: opacity 0.2s;
   }
+  .freq-row.disabled .freq-color-dot { opacity: 0.25; }
 
-  .box-card input[type=number] { padding: 6px 8px; font-size: 0.8rem; }
-
-  .box-index {
-    position: absolute;
-    top: 8px;
-    right: 10px;
-    font-family: var(--mono);
-    font-size: 0.6rem;
-    color: var(--text-dim);
-  }
-
-  .color-dot {
-    width: 8px;
-    height: 8px;
-    border-radius: 50%;
-    display: inline-block;
-    margin-right: 6px;
-    vertical-align: middle;
-  }
-
-  .btn-remove {
-    background: none;
-    border: 1px solid #ff333533;
-    color: var(--danger);
+  .freq-label-input {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    color: var(--text);
     font-family: var(--mono);
     font-size: 0.7rem;
-    padding: 6px 10px;
-    cursor: pointer;
-    letter-spacing: 0.1em;
-    transition: all 0.2s;
-    align-self: end;
-  }
-
-  .btn-remove:hover { background: #ff333520; border-color: var(--danger); }
-
-  .btn-add {
-    background: none;
-    border: 1px dashed var(--border);
-    color: var(--text-dim);
-    font-family: var(--mono);
-    font-size: 0.75rem;
-    padding: 10px;
-    cursor: pointer;
+    padding: 4px 7px;
+    outline: none;
     width: 100%;
-    letter-spacing: 0.1em;
-    transition: all 0.2s;
-    text-transform: uppercase;
+    transition: border-color 0.14s;
+  }
+  .freq-label-input:focus { border-color: var(--accent); }
+  .freq-label-input::placeholder { color: var(--text-dim); opacity: 0.55; }
+
+  .btn-toggle {
+    background: none; border: 1px solid var(--border);
+    color: var(--text-dim); font-family: var(--mono);
+    font-size: 0.6rem; padding: 4px 9px; cursor: pointer;
+    letter-spacing: 0.1em; text-transform: uppercase;
+    transition: all 0.14s; white-space: nowrap;
+  }
+  .btn-toggle.active  { border-color: var(--success); color: var(--success); }
+  .btn-toggle.active:hover { background: rgba(0,180,90,0.1); }
+  .btn-toggle:not(.active) { border-color: rgba(200,30,50,0.35); color: var(--danger); }
+  .btn-toggle:not(.active):hover { background: rgba(200,30,50,0.08); }
+
+  .btn-remove-freq {
+    background: none; border: 1px solid rgba(200,30,50,0.22);
+    color: var(--danger); font-family: var(--mono); font-size: 0.6rem;
+    padding: 4px 7px; cursor: pointer; transition: all 0.14s;
+  }
+  .btn-remove-freq:hover { background: rgba(200,30,50,0.1); border-color: var(--danger); }
+
+  .toggle-all-row { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; }
+
+  .btn-small {
+    background: none; border: 1px solid var(--border);
+    color: var(--text-dim); font-family: var(--mono);
+    font-size: 0.6rem; padding: 5px 11px; cursor: pointer;
+    letter-spacing: 0.07em; text-transform: uppercase; transition: all 0.14s;
+  }
+  .btn-small:hover { border-color: var(--accent); color: var(--accent); }
+
+  .active-count { font-family: var(--mono); font-size: 0.66rem; color: var(--text-dim); margin-left: auto; }
+  .active-count span { color: var(--accent); }
+
+  /* ── ADD FREQ PANEL ── */
+  .add-freq-panel {
+    background: var(--surface2); border: 1px solid var(--border);
+    padding: 12px; display: none; flex-direction: column; gap: 9px;
+  }
+  .add-freq-panel.open { display: flex; }
+
+  .freq-picker-label {
+    font-family: var(--mono); font-size: 0.63rem; color: var(--text-dim);
+    letter-spacing: 0.1em; text-transform: uppercase;
   }
 
-  .btn-add:hover { border-color: var(--accent); color: var(--accent); }
+  .freq-picker-grid {
+    display: flex; flex-wrap: wrap; gap: 5px;
+    max-height: 150px; overflow-y: auto;
+  }
+  .freq-picker-grid::-webkit-scrollbar { width: 3px; }
+  .freq-picker-grid::-webkit-scrollbar-thumb { background: var(--border2); }
 
-  /* ── LAUNCH BUTTON ── */
+  .freq-pill {
+    font-family: var(--mono); font-size: 0.66rem;
+    padding: 4px 10px; border: 1px solid var(--border);
+    color: var(--text-dim); cursor: pointer; background: none;
+    transition: all 0.12s;
+  }
+  .freq-pill:hover { border-color: var(--accent); color: var(--accent); }
+  .freq-pill.already-added { opacity: 0.3; cursor: default; border-style: dashed; }
+  .freq-pill.already-added:hover { border-color: var(--border); color: var(--text-dim); }
+
+  /* ── LAYOUT ── */
+  .layout-select { display: flex; gap: 5px; flex-wrap: wrap; }
+
+  .btn-layout {
+    background: none; border: 1px solid var(--border); color: var(--text-dim);
+    font-family: var(--mono); font-size: 0.6rem; padding: 5px 12px;
+    cursor: pointer; letter-spacing: 0.07em; text-transform: uppercase; transition: all 0.14s;
+  }
+  .btn-layout.selected { border-color: var(--accent); color: var(--accent); background: rgba(0,150,200,0.07); }
+  .btn-layout:hover:not(.selected) { border-color: var(--border2); color: var(--text); }
+
+  /* ── PREVIEW ── */
+  .layout-preview {
+    background: var(--preview-bg); border: 1px solid var(--border);
+    aspect-ratio: 16/9; position: relative; overflow: hidden; margin-top: 4px;
+    transition: background 0.2s;
+  }
+
+  .preview-box {
+    position: absolute; display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    font-family: var(--mono); font-size: 0.48rem; color: rgba(255,255,255,0.65);
+    border: 1.5px solid; background: var(--preview-box-bg);
+    transition: opacity 0.2s; cursor: grab; user-select: none;
+    line-height: 1.3; text-align: center; padding: 2px; overflow: hidden;
+  }
+  .preview-box:active { cursor: grabbing; }
+  .preview-box.hidden-box { opacity: 0.14; cursor: default; pointer-events: none; }
+  .preview-box.dragging { opacity: 0.88; box-shadow: 0 0 0 1px rgba(255,255,255,0.3); z-index: 900; cursor: grabbing; }
+
+  .snap-guide { position: absolute; pointer-events: none; z-index: 800; opacity: 0; transition: opacity 0.08s; }
+  .snap-guide.h { left: 0; right: 0; height: 1px; background: rgba(255,210,0,0.75); }
+  .snap-guide.v { top: 0; bottom: 0; width: 1px; background: rgba(255,210,0,0.75); }
+  .snap-guide.visible { opacity: 1; }
+
+  /* ── SIZE SLIDERS ── */
+  .size-row { display: flex; align-items: center; gap: 8px; }
+  .size-row label { font-size: 0.7rem; color: var(--text-dim); text-transform: uppercase; white-space: nowrap; flex: 0 0 68px; }
+  .size-row input[type=range] { -webkit-appearance: none; flex: 1; height: 2px; background: var(--border); outline: none; }
+  .size-row input[type=range]::-webkit-slider-thumb {
+    -webkit-appearance: none; width: 12px; height: 12px; background: var(--accent);
+    cursor: pointer; clip-path: polygon(50% 0%, 100% 100%, 0% 100%); transform: rotate(180deg);
+  }
+  .size-val { font-family: var(--mono); font-size: 0.74rem; color: var(--accent); flex: 0 0 48px; text-align: right; }
+
+  /* ── LAUNCH BAR ── */
   .launch-wrap {
-    padding: 24px 40px;
-    border-top: 1px solid var(--border);
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
+    padding: 16px 32px; border-top: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: space-between;
+    background: var(--surface); gap: 20px; transition: background 0.22s;
   }
 
-  .info-text {
-    font-family: var(--mono);
-    font-size: 0.72rem;
-    color: var(--text-dim);
-    line-height: 1.6;
-  }
-
+  .info-text { font-family: var(--mono); font-size: 0.66rem; color: var(--text-dim); line-height: 1.6; }
   .info-text span { color: var(--accent2); }
 
   .btn-launch {
-    background: var(--accent);
-    color: var(--bg);
-    border: none;
-    font-family: var(--mono);
-    font-size: 0.85rem;
-    font-weight: 700;
-    padding: 14px 40px;
-    cursor: pointer;
-    letter-spacing: 0.2em;
+    background: var(--accent); color: var(--bg); border: none;
+    font-family: var(--mono); font-size: 0.8rem; font-weight: 700;
+    padding: 13px 34px; cursor: pointer; letter-spacing: 0.2em;
     text-transform: uppercase;
-    clip-path: polygon(8px 0%, 100% 0%, calc(100% - 8px) 100%, 0% 100%);
-    transition: opacity 0.2s, transform 0.1s;
+    clip-path: polygon(8px 0%, 100% 0%, calc(100%-8px) 100%, 0% 100%);
+    transition: opacity 0.2s, transform 0.1s; white-space: nowrap;
   }
-
   .btn-launch:hover { opacity: 0.85; transform: scale(1.02); }
   .btn-launch:active { transform: scale(0.98); }
 
-  /* ── VALID FREQUENCIES ── */
-  .freq-grid {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 6px;
-    margin-top: 6px;
-  }
-
-  .freq-pill {
-    font-family: var(--mono);
-    font-size: 0.72rem;
-    padding: 3px 9px;
-    border: 1px solid var(--border);
-    color: var(--text-dim);
-    cursor: pointer;
-    transition: all 0.15s;
-    border-radius: 0;
-  }
-
-  .freq-pill:hover { border-color: var(--accent3); color: var(--accent3); }
-
   /* ── STIMULUS PAGE ── */
-  #stimulus-page {
-    display: none;
-    width: 100vw;
-    height: 100vh;
-    background: #000;
-    position: relative;
-    overflow: hidden;
-  }
+  #stimulus-page { display: none; width: 100vw; height: 100vh; background: #000; position: relative; overflow: hidden; }
+  #stimulus-canvas { position: absolute; top:0; left:0; width:100%; height:100%; }
 
-  #stimulus-canvas {
-    position: absolute;
-    top: 0; left: 0;
-    width: 100%; height: 100%;
-  }
-
-  /* ── STIMULUS HUD ── */
   .stim-hud {
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    background: rgba(8, 12, 16, 0.9);
-    border-top: 1px solid #1a2a3a;
-    padding: 12px 24px;
-    display: flex;
-    align-items: center;
-    gap: 24px;
-    font-family: var(--mono);
-    font-size: 0.72rem;
-    color: var(--text-dim);
-    backdrop-filter: blur(6px);
-    z-index: 100;
+    position: fixed; bottom:0; left:0; right:0;
+    background: rgba(6,10,14,0.93); border-top: 1px solid #1a2a3a;
+    padding: 9px 20px; display: flex; align-items: center; gap: 16px;
+    font-family: var(--mono); font-size: 0.68rem; color: #4a6a7a;
+    backdrop-filter: blur(6px); z-index: 100; flex-wrap: wrap;
   }
-
-  .hud-item { display: flex; align-items: center; gap: 8px; }
-  .hud-dot { width: 6px; height: 6px; border-radius: 50%; }
-  .hud-freq { color: var(--text); }
+  .hud-item { display: flex; align-items: center; gap: 6px; }
+  .hud-dot  { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
+  .hud-freq { color: #c8dae8; }
+  .hud-label { color: #7a9aaa; font-size: 0.6rem; }
+  .stim-timer { font-family: var(--mono); font-size: 0.68rem; color: #00e5ff; }
 
   .btn-stop {
-    margin-left: auto;
-    background: none;
-    border: 1px solid var(--danger);
-    color: var(--danger);
-    font-family: var(--mono);
-    font-size: 0.72rem;
-    padding: 6px 18px;
-    cursor: pointer;
-    letter-spacing: 0.1em;
-    transition: all 0.2s;
+    margin-left: auto; background: none; border: 1px solid #ff3355; color: #ff3355;
+    font-family: var(--mono); font-size: 0.68rem; padding: 5px 15px;
+    cursor: pointer; letter-spacing: 0.1em; transition: all 0.18s;
   }
+  .btn-stop:hover { background: rgba(255,51,85,0.14); }
 
-  .btn-stop:hover { background: #ff333520; }
+  .crosshair { position: fixed; top:50%; left:50%; transform:translate(-50%,-50%); pointer-events:none; z-index:50; }
+  .crosshair line { stroke: rgba(255,255,255,0.15); stroke-width:1; }
 
-  .stim-timer {
-    font-family: var(--mono);
-    font-size: 0.72rem;
-    color: var(--accent);
-    margin-left: auto;
-  }
-
-  /* ── CROSSHAIR ── */
-  .crosshair {
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    pointer-events: none;
-    z-index: 50;
-  }
-
-  .crosshair line { stroke: rgba(255,255,255,0.15); stroke-width: 1; }
-
-  /* ── RESPONSIVE ── */
-  @media (max-width: 768px) {
+  @media (max-width: 780px) {
     .setup-body { grid-template-columns: 1fr; }
-    .setup-left { border-right: none; border-bottom: 1px solid var(--border); }
-    .box-card { grid-template-columns: 1fr 1fr; }
-    .box-card > div:nth-child(4), .btn-remove { grid-column: span 1; }
+    .setup-left { border-right: none; border-bottom: 1px solid var(--border); max-height: none; }
+    .setup-right { max-height: none; }
+    .freq-row { grid-template-columns: 68px 6px 1fr auto auto; }
   }
 </style>
 </head>
 <body>
 
-<!-- ════════════ SETUP PAGE ════════════ -->
+<!-- ════════ SETUP PAGE ════════ -->
 <div id="setup-page">
   <div class="header">
     <h1>▸ SSVEP Stimulus</h1>
     <p>Steady-State Visually Evoked Potential — 60 Hz Display</p>
+    <div class="theme-toggle" onclick="toggleTheme()">
+      <div class="toggle-track"><div class="toggle-thumb"></div></div>
+      <span id="theme-label">DARK</span>
+    </div>
   </div>
 
   <div class="setup-body">
 
-    <!-- LEFT: Global settings -->
+    <!-- ─── LEFT PANEL ─── -->
     <div class="setup-left">
-      <div>
-        <div class="section-label">Global Settings</div>
 
+      <!-- Display settings -->
+      <div>
+        <div class="section-label">Display Settings</div>
+        <div class="control-row">
+          <label>Stimulus Shape</label>
+          <select id="stim-shape">
+            <option value="checkerboard" selected>Checkerboard (stronger SSVEP)</option>
+            <option value="rect">Rectangle</option>
+            <option value="circle">Circle</option>
+          </select>
+        </div>
         <div class="control-row">
           <label>Background Color</label>
           <select id="bg-color">
@@ -410,16 +428,6 @@
             <option value="#ffffff">White</option>
           </select>
         </div>
-
-        <div class="control-row">
-          <label>Stimulus Shape</label>
-          <select id="stim-shape">
-            <option value="rect">Rectangle</option>
-            <option value="circle">Circle</option>
-            <option value="checkerboard">Checkerboard (stronger SSVEP)</option>
-          </select>
-        </div>
-
         <div class="control-row">
           <label>Show Fixation Crosshair</label>
           <select id="show-crosshair">
@@ -427,9 +435,8 @@
             <option value="no">No</option>
           </select>
         </div>
-
         <div class="control-row">
-          <label>HUD visibility</label>
+          <label>HUD Visibility</label>
           <select id="show-hud">
             <option value="yes">Yes — show frequency bar</option>
             <option value="no">No — full black</option>
@@ -437,198 +444,524 @@
         </div>
       </div>
 
+      <!-- Label settings -->
       <div>
-        <div class="section-label">Valid 60 Hz Frequencies</div>
-        <p style="font-size:0.78rem; color:var(--text-dim); margin-bottom:10px; line-height:1.5;">
-          Only these frequencies produce perfectly even flicker on a 60 Hz display. Click to copy into a box below.
+        <div class="section-label">In-Box Label Settings</div>
+        <div class="label-grid">
+          <div class="control-row">
+            <label>Show Label</label>
+            <select id="show-box-label">
+              <option value="yes">Yes</option>
+              <option value="no">No</option>
+            </select>
+          </div>
+          <div class="control-row">
+            <label>Font Size</label>
+            <select id="label-font-size">
+              <option value="11">Small (11px)</option>
+              <option value="16" selected>Medium (16px)</option>
+              <option value="22">Large (22px)</option>
+              <option value="30">XL (30px)</option>
+            </select>
+          </div>
+          <div class="control-row">
+            <label>Position</label>
+            <select id="label-pos">
+              <option value="center" selected>Center</option>
+              <option value="top">Top</option>
+              <option value="bottom">Bottom</option>
+            </select>
+          </div>
+          <div class="control-row">
+            <label>Color</label>
+            <select id="label-color">
+              <option value="white">White</option>
+              <option value="box">Match Box Color</option>
+              <option value="black">Black</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <!-- Frequency toggles -->
+      <div class="freq-section">
+        <div class="section-label">Active Frequencies</div>
+        <p style="font-size:0.73rem;color:var(--text-dim);margin-bottom:6px;line-height:1.5;">
+          Toggle each. Add a label per box — shown during stimulus. Drag preview boxes to reposition.
         </p>
-        <div class="freq-grid" id="freq-pills"></div>
+        <div class="toggle-all-row">
+          <button class="btn-small" onclick="setAllFreqs(true)">Enable All</button>
+          <button class="btn-small" onclick="setAllFreqs(false)">Disable All</button>
+          <button class="btn-small" onclick="toggleAddPanel()">+ Add Freq</button>
+          <div class="active-count">Active: <span id="active-count">0</span> / <span id="total-count">0</span></div>
+        </div>
+
+        <!-- Frequency picker panel -->
+        <div class="add-freq-panel" id="add-freq-panel">
+          <div class="freq-picker-label">All valid 60 Hz frequencies — click to add</div>
+          <div class="freq-picker-grid" id="freq-picker-grid"></div>
+          <button class="btn-small" style="align-self:flex-start" onclick="toggleAddPanel()">✕ Close</button>
+        </div>
+
+        <div class="freq-toggle-grid" id="freq-toggle-grid"></div>
       </div>
     </div>
 
-    <!-- RIGHT: Per-box config -->
+    <!-- ─── RIGHT PANEL ─── -->
     <div class="setup-right">
+
+      <!-- Layout -->
       <div>
-        <div class="section-label">Stimulus Boxes</div>
-        <p style="font-size:0.78rem; color:var(--text-dim); margin-bottom:14px; line-height:1.5;">
-          Position is in % of screen. Size in px. Frequency must be a valid 60 Hz value.
+        <div class="section-label">Layout</div>
+        <div class="layout-select" id="layout-select">
+          <button class="btn-layout selected" data-layout="row"     onclick="selectLayout('row')">Row</button>
+          <button class="btn-layout"          data-layout="grid"    onclick="selectLayout('grid')">Grid</button>
+          <button class="btn-layout"          data-layout="circle"  onclick="selectLayout('circle')">Circle</button>
+          <button class="btn-layout"          data-layout="corners" onclick="selectLayout('corners')">Corners</button>
+          <button class="btn-layout"          data-layout="spread"  onclick="selectLayout('spread')">Spread</button>
+          <button class="btn-layout"          data-layout="custom"  onclick="selectLayout('custom')">Custom</button>
+        </div>
+        <p style="font-size:0.7rem;color:var(--text-dim);margin-top:6px;line-height:1.5;">
+          Drag boxes in the preview to set custom positions. Yellow guides snap to center &amp; sibling boxes.
         </p>
-        <div id="box-list"></div>
-        <button class="btn-add" onclick="addBox()">+ Add Stimulus Box</button>
+      </div>
+
+      <!-- Box size -->
+      <div>
+        <div class="section-label">Box Size</div>
+        <div class="size-row" style="margin-bottom:10px;">
+          <label>Width</label>
+          <input type="range" id="box-w" min="60" max="500" value="160" oninput="updateSizeDisplay();updatePreview();">
+          <span class="size-val" id="box-w-val">160 px</span>
+        </div>
+        <div class="size-row">
+          <label>Height</label>
+          <input type="range" id="box-h" min="60" max="500" value="160" oninput="updateSizeDisplay();updatePreview();">
+          <span class="size-val" id="box-h-val">160 px</span>
+        </div>
+      </div>
+
+      <!-- Preview -->
+      <div>
+        <div class="section-label">Preview</div>
+        <div class="layout-preview" id="layout-preview">
+          <div class="snap-guide h" id="snap-h" style="top:50%"></div>
+          <div class="snap-guide v" id="snap-v" style="left:50%"></div>
+        </div>
+        <p style="font-size:0.66rem;color:var(--text-dim);margin-top:6px;line-height:1.5;">
+          Bright = active &nbsp;·&nbsp; Dimmed = disabled &nbsp;·&nbsp; Yellow = snap guide
+        </p>
       </div>
     </div>
   </div>
 
   <div class="launch-wrap">
     <div class="info-text">
-      Stare at a box with peripheral focus. Your visual cortex will lock to its frequency.<br>
-      EEG analysis should show a peak at <span>that Hz and harmonics (2×, 3×)</span>.
+      Stare at a box with peripheral focus. Visual cortex locks to its frequency.<br>
+      EEG should show a peak at <span>that Hz and harmonics (2×, 3×)</span>.
     </div>
     <button class="btn-launch" onclick="launchStimulus()">▶ Launch Stimulus</button>
   </div>
 </div>
 
-<!-- ════════════ STIMULUS PAGE ════════════ -->
+<!-- ════════ STIMULUS PAGE ════════ -->
 <div id="stimulus-page">
   <canvas id="stimulus-canvas"></canvas>
-
   <svg class="crosshair" id="crosshair-svg" width="40" height="40" viewBox="0 0 40 40">
     <line x1="20" y1="0" x2="20" y2="40"/>
     <line x1="0" y1="20" x2="40" y2="20"/>
     <circle cx="20" cy="20" r="2" fill="rgba(255,255,255,0.2)"/>
   </svg>
-
   <div class="stim-hud" id="stim-hud">
-    <div id="hud-boxes" style="display:flex;gap:20px;flex-wrap:wrap;"></div>
+    <div id="hud-boxes" style="display:flex;gap:14px;flex-wrap:wrap;"></div>
     <div class="stim-timer" id="stim-timer">00:00</div>
     <button class="btn-stop" onclick="stopStimulus()">■ STOP</button>
   </div>
 </div>
 
 <script>
-// ── VALID 60Hz FREQUENCIES ──
-const VALID_FREQS = [6, 7.5, 10, 12, 15, 20, 30];
-const BOX_COLORS = ['#00e5ff','#ff6b35','#7fff00','#ff3399','#b388ff','#ffd600','#00e676'];
+// ════════════════════════════════════════
+// CONSTANTS
+// ════════════════════════════════════════
 
-// ── STATE ──
-let boxes = [];
-let nextId = 1;
+// All frequencies where 60/f is an integer (f = 60/n for n=2..60)
+const ALL_60HZ_FREQS = (() => {
+  const seen = new Set();
+  const freqs = [];
+  for (let n = 2; n <= 60; n++) {
+    const f = Math.round((60 / n) * 10000) / 10000;
+    if (!seen.has(f) && f >= 1) { seen.add(f); freqs.push(f); }
+  }
+  return freqs.sort((a, b) => a - b);
+})();
 
-// ── INIT ──
+const DEFAULT_FREQS = [6, 7.5, 10, 12, 15, 20, 30];
+
+const BOX_COLORS = [
+  '#00e5ff','#ff6b35','#7fff00','#ff3399',
+  '#b388ff','#ffd600','#00e676','#ff9100',
+  '#40c4ff','#ea80fc','#ccff90','#ff6e40'
+];
+
+// ════════════════════════════════════════
+// STATE
+// ════════════════════════════════════════
+// Each: { freq, enabled, label, x, y }  — x/y are % of screen, center-based
+let freqEntries = [];
+let currentLayout = 'row';
+let addPanelOpen = false;
+let dragging = null; // { idx, startMouseX, startMouseY, startX, startY }
+
+// ════════════════════════════════════════
+// THEME
+// ════════════════════════════════════════
+function toggleTheme() {
+  const html = document.documentElement;
+  const dark = html.getAttribute('data-theme') === 'dark';
+  html.setAttribute('data-theme', dark ? 'light' : 'dark');
+  document.getElementById('theme-label').textContent = dark ? 'LIGHT' : 'DARK';
+}
+
+// ════════════════════════════════════════
+// INIT
+// ════════════════════════════════════════
 function init() {
-  // Render freq pills
-  const pillContainer = document.getElementById('freq-pills');
-  VALID_FREQS.forEach(f => {
-    const pill = document.createElement('button');
-    pill.className = 'freq-pill';
-    pill.textContent = f + ' Hz';
-    pill.onclick = () => setLastBoxFreq(f);
-    pillContainer.appendChild(pill);
+  DEFAULT_FREQS.forEach(f => freqEntries.push({ freq: f, enabled: true, label: '', x: 50, y: 50 }));
+  applyLayout('row');
+  renderFreqToggles();
+  renderFreqPicker();
+  updatePreview();
+  updateSizeDisplay();
+}
+
+// ════════════════════════════════════════
+// ADD FREQUENCY PANEL
+// ════════════════════════════════════════
+function toggleAddPanel() {
+  addPanelOpen = !addPanelOpen;
+  document.getElementById('add-freq-panel').classList.toggle('open', addPanelOpen);
+  if (addPanelOpen) renderFreqPicker();
+}
+
+function renderFreqPicker() {
+  const grid = document.getElementById('freq-picker-grid');
+  grid.innerHTML = '';
+  const existing = new Set(freqEntries.map(e => e.freq));
+  ALL_60HZ_FREQS.forEach(f => {
+    const btn = document.createElement('button');
+    const already = existing.has(f);
+    btn.className = 'freq-pill' + (already ? ' already-added' : '');
+    btn.textContent = f + ' Hz';
+    if (!already) btn.onclick = () => addFreq(f);
+    grid.appendChild(btn);
   });
-
-  // Default: 3 boxes
-  addBox(10, 20, 30, 160, 160);
-  addBox(50, 50, 15, 160, 160);
-  addBox(80, 20, 12, 160, 160);
 }
 
-function setLastBoxFreq(f) {
-  if (boxes.length === 0) return;
-  const last = boxes[boxes.length - 1];
-  document.getElementById('freq-' + last.id).value = f;
+function addFreq(f) {
+  freqEntries.push({ freq: f, enabled: true, label: '', x: 50, y: 50 });
+  freqEntries.sort((a, b) => a.freq - b.freq);
+  if (currentLayout !== 'custom') applyLayout(currentLayout);
+  renderFreqToggles();
+  renderFreqPicker();
+  updatePreview();
 }
 
-// ── BOX MANAGEMENT ──
-function addBox(x = 40, y = 40, freq = 10, w = 150, h = 150) {
-  const id = nextId++;
-  boxes.push({ id });
-  renderBoxList();
-  // Set defaults after render
-  document.getElementById('x-' + id).value = x;
-  document.getElementById('y-' + id).value = y;
-  document.getElementById('freq-' + id).value = freq;
-  document.getElementById('w-' + id).value = w;
-  document.getElementById('h-' + id).value = h;
-}
-
-function removeBox(id) {
-  boxes = boxes.filter(b => b.id !== id);
-  renderBoxList();
-}
-
-function renderBoxList() {
-  const list = document.getElementById('box-list');
-  list.innerHTML = '';
-  boxes.forEach((b, i) => {
+// ════════════════════════════════════════
+// FREQUENCY TOGGLE ROWS
+// ════════════════════════════════════════
+function renderFreqToggles() {
+  const grid = document.getElementById('freq-toggle-grid');
+  grid.innerHTML = '';
+  freqEntries.forEach((entry, i) => {
     const color = BOX_COLORS[i % BOX_COLORS.length];
-    const card = document.createElement('div');
-    card.className = 'box-card';
-    card.innerHTML = `
-      <span class="box-index"><span class="color-dot" style="background:${color}"></span>BOX ${i+1}</span>
-      <div>
-        <div class="card-label">Freq (Hz)</div>
-        <input type="number" id="freq-${b.id}" min="6" max="30" step="0.1" value="10">
-      </div>
-      <div>
-        <div class="card-label">X pos (%)</div>
-        <input type="number" id="x-${b.id}" min="0" max="95" value="40">
-      </div>
-      <div>
-        <div class="card-label">Y pos (%)</div>
-        <input type="number" id="y-${b.id}" min="0" max="95" value="40">
-      </div>
-      <div>
-        <div class="card-label">Width (px)</div>
-        <input type="number" id="w-${b.id}" min="40" max="800" value="150">
-      </div>
-      <div>
-        <div class="card-label">Height (px)</div>
-        <input type="number" id="h-${b.id}" min="40" max="800" value="150">
-      </div>
-      <button class="btn-remove" onclick="removeBox(${b.id})">✕ Remove</button>
+    const row = document.createElement('div');
+    row.className = 'freq-row' + (entry.enabled ? '' : ' disabled');
+    row.id = 'freq-row-' + i;
+    row.innerHTML = `
+      <div class="freq-hz">${entry.freq} Hz</div>
+      <div class="freq-color-dot" style="background:${color}"></div>
+      <input class="freq-label-input" type="text" placeholder="Label…"
+        value="${entry.label}" maxlength="24"
+        oninput="setLabel(${i}, this.value)" title="Custom label shown inside stimulus box">
+      <button class="btn-toggle ${entry.enabled ? 'active' : ''}" onclick="toggleFreq(${i})">
+        ${entry.enabled ? '● ON' : '○ OFF'}
+      </button>
+      <button class="btn-remove-freq" onclick="removeFreq(${i})" title="Remove">✕</button>
     `;
-    list.appendChild(card);
+    grid.appendChild(row);
+  });
+  updateActiveCount();
+}
+
+function toggleFreq(i) {
+  freqEntries[i].enabled = !freqEntries[i].enabled;
+  renderFreqToggles();
+  updatePreview();
+}
+
+function setLabel(i, val) {
+  freqEntries[i].label = val;
+  updatePreview();
+}
+
+function removeFreq(i) {
+  freqEntries.splice(i, 1);
+  if (currentLayout !== 'custom') applyLayout(currentLayout);
+  renderFreqToggles();
+  renderFreqPicker();
+  updatePreview();
+}
+
+function setAllFreqs(state) {
+  freqEntries.forEach(e => e.enabled = state);
+  renderFreqToggles();
+  updatePreview();
+}
+
+function updateActiveCount() {
+  document.getElementById('active-count').textContent = freqEntries.filter(e => e.enabled).length;
+  document.getElementById('total-count').textContent  = freqEntries.length;
+}
+
+// ════════════════════════════════════════
+// LAYOUT ENGINE
+// ════════════════════════════════════════
+function selectLayout(name) {
+  currentLayout = name;
+  document.querySelectorAll('.btn-layout').forEach(b =>
+    b.classList.toggle('selected', b.dataset.layout === name));
+  if (name !== 'custom') applyLayout(name);
+  updatePreview();
+}
+
+function applyLayout(name) {
+  const n = freqEntries.length;
+  if (n === 0) return;
+  const pos = computePositions(n, name);
+  freqEntries.forEach((e, i) => { e.x = pos[i].x; e.y = pos[i].y; });
+}
+
+function computePositions(n, layout) {
+  if (n === 0) return [];
+  const P = [];
+
+  if (layout === 'row') {
+    const step = 100 / (n + 1);
+    for (let i = 0; i < n; i++) P.push({ x: step * (i+1), y: 50 });
+
+  } else if (layout === 'grid') {
+    const cols = Math.ceil(Math.sqrt(n));
+    const rows = Math.ceil(n / cols);
+    const xs = 100 / (cols + 1), ys = 100 / (rows + 1);
+    let idx = 0;
+    for (let r = 0; r < rows && idx < n; r++)
+      for (let c = 0; c < cols && idx < n; c++, idx++)
+        P.push({ x: xs*(c+1), y: ys*(r+1) });
+
+  } else if (layout === 'circle') {
+    for (let i = 0; i < n; i++) {
+      const a = (2*Math.PI*i/n) - Math.PI/2;
+      P.push({ x: 50 + 35*Math.cos(a), y: 50 + 35*Math.sin(a) });
+    }
+  } else if (layout === 'corners') {
+    const pts = [
+      {x:14,y:16},{x:86,y:16},{x:86,y:84},{x:14,y:84},
+      {x:50,y:50},{x:50,y:16},{x:50,y:84},{x:14,y:50},
+      {x:86,y:50},{x:28,y:50},{x:72,y:50},{x:50,y:32}
+    ];
+    for (let i = 0; i < n; i++) P.push(pts[i % pts.length]);
+
+  } else if (layout === 'spread') {
+    const xs = 100 / (n + 1);
+    for (let i = 0; i < n; i++) {
+      const ry = i%3 === 0 ? 24 : i%3 === 1 ? 50 : 76;
+      P.push({ x: xs*(i+1), y: ry });
+    }
+  } else {
+    // custom: keep existing
+    for (let i = 0; i < n; i++) P.push({ x: freqEntries[i]?.x ?? 50, y: freqEntries[i]?.y ?? 50 });
+  }
+  return P;
+}
+
+// ════════════════════════════════════════
+// PREVIEW + DRAG & DROP
+// ════════════════════════════════════════
+const SNAP_PX = 7;
+
+function updatePreview() {
+  const preview = document.getElementById('layout-preview');
+  preview.querySelectorAll('.preview-box').forEach(el => el.remove());
+
+  const pw = preview.clientWidth  || 400;
+  const ph = preview.clientHeight || (pw * 9/16);
+  const bw = parseInt(document.getElementById('box-w').value);
+  const bh = parseInt(document.getElementById('box-h').value);
+  const sw = Math.max(16, bw * (pw/1440) * 1.5);
+  const sh = Math.max(12, bh * (ph/810)  * 1.5);
+
+  freqEntries.forEach((entry, i) => {
+    const color = BOX_COLORS[i % BOX_COLORS.length];
+    const el = document.createElement('div');
+    el.className = 'preview-box' + (entry.enabled ? '' : ' hidden-box');
+    el.dataset.idx = i;
+    el.style.cssText = `
+      left: calc(${entry.x}% - ${sw/2}px);
+      top:  calc(${entry.y}% - ${sh/2}px);
+      width: ${sw}px; height: ${sh}px;
+      border-color: ${color}; color: ${color};
+    `;
+    el.innerHTML =
+      `<span style="font-size:0.46rem;opacity:0.75;">${entry.freq} Hz</span>` +
+      (entry.label ? `<span style="font-size:0.5rem;color:#fff;opacity:0.9;word-break:break-word;">${entry.label}</span>` : '');
+
+    if (entry.enabled) {
+      el.addEventListener('mousedown',  e => startDrag(e, i, pw, ph, false));
+      el.addEventListener('touchstart', e => startDrag(e, i, pw, ph, true), { passive: false });
+    }
+    preview.appendChild(el);
   });
 }
 
-// ── READ CONFIG ──
+function startDrag(e, idx, pw, ph, touch) {
+  e.preventDefault();
+  const clientX = touch ? e.touches[0].clientX : e.clientX;
+  const clientY = touch ? e.touches[0].clientY : e.clientY;
+  dragging = { idx, startMouseX: clientX, startMouseY: clientY,
+               startX: freqEntries[idx].x, startY: freqEntries[idx].y, pw, ph };
+  document.getElementById('layout-preview')
+    .querySelectorAll('.preview-box')[idx]?.classList.add('dragging');
+  // switch to custom layout
+  currentLayout = 'custom';
+  document.querySelectorAll('.btn-layout').forEach(b =>
+    b.classList.toggle('selected', b.dataset.layout === 'custom'));
+}
+
+document.addEventListener('mousemove', onMove);
+document.addEventListener('mouseup',   onUp);
+document.addEventListener('touchmove', e => onMove(e, true), { passive: false });
+document.addEventListener('touchend',  onUp);
+
+function onMove(e, touch) {
+  if (!dragging) return;
+  const clientX = touch ? e.touches[0].clientX : e.clientX;
+  const clientY = touch ? e.touches[0].clientY : e.clientY;
+  const dx = clientX - dragging.startMouseX;
+  const dy = clientY - dragging.startMouseY;
+
+  let nx = dragging.startX + (dx / dragging.pw) * 100;
+  let ny = dragging.startY + (dy / dragging.ph) * 100;
+  nx = Math.max(2, Math.min(98, nx));
+  ny = Math.max(2, Math.min(98, ny));
+
+  const snapped = snap(nx, ny, dragging.idx, dragging.pw, dragging.ph);
+  freqEntries[dragging.idx].x = snapped.x;
+  freqEntries[dragging.idx].y = snapped.y;
+
+  showGuides(snapped.snapH, snapped.snapV, snapped.y, snapped.x);
+  updatePreview();
+}
+
+function onUp() {
+  if (!dragging) return;
+  dragging = null;
+  document.getElementById('snap-h').classList.remove('visible');
+  document.getElementById('snap-v').classList.remove('visible');
+}
+
+function snap(x, y, selfIdx, pw, ph) {
+  const thX = SNAP_PX / pw * 100;
+  const thY = SNAP_PX / ph * 100;
+  const targetsX = [50], targetsY = [50];
+  freqEntries.forEach((e, i) => {
+    if (i !== selfIdx && e.enabled) { targetsX.push(e.x); targetsY.push(e.y); }
+  });
+  let snapH = false, snapV = false;
+  for (const ty of targetsY) if (Math.abs(y - ty) < thY) { y = ty; snapH = true; break; }
+  for (const tx of targetsX) if (Math.abs(x - tx) < thX) { x = tx; snapV = true; break; }
+  return { x, y, snapH, snapV };
+}
+
+function showGuides(h, v, y, x) {
+  const gh = document.getElementById('snap-h');
+  const gv = document.getElementById('snap-v');
+  gh.classList.toggle('visible', h);
+  gv.classList.toggle('visible', v);
+  if (h) gh.style.top  = y + '%';
+  if (v) gv.style.left = x + '%';
+}
+
+// ════════════════════════════════════════
+// SIZE DISPLAY
+// ════════════════════════════════════════
+function updateSizeDisplay() {
+  document.getElementById('box-w-val').textContent = document.getElementById('box-w').value + ' px';
+  document.getElementById('box-h-val').textContent = document.getElementById('box-h').value + ' px';
+}
+
+// ════════════════════════════════════════
+// READ CONFIG FOR STIMULUS
+// ════════════════════════════════════════
 function readConfig() {
-  return boxes.map((b, i) => {
-    const freq = parseFloat(document.getElementById('freq-' + b.id).value);
-    const x    = parseFloat(document.getElementById('x-'    + b.id).value);
-    const y    = parseFloat(document.getElementById('y-'    + b.id).value);
-    const w    = parseFloat(document.getElementById('w-'    + b.id).value);
-    const h    = parseFloat(document.getElementById('h-'    + b.id).value);
-    return { freq, x, y, w, h, color: BOX_COLORS[i % BOX_COLORS.length] };
-  });
+  const bw = parseFloat(document.getElementById('box-w').value);
+  const bh = parseFloat(document.getElementById('box-h').value);
+  return freqEntries
+    .filter(e => e.enabled)
+    .map((e, j) => ({
+      freq:  e.freq,
+      label: e.label,
+      x: e.x, y: e.y,
+      w: bw, h: bh,
+      color: BOX_COLORS[freqEntries.indexOf(e) % BOX_COLORS.length]
+    }));
 }
 
-// ── STIMULUS ENGINE ──
-let animFrame = null;
-let startTime = null;
-let stimConfig = [];
-let bgColor = '#000000';
-let shape = 'rect';
+// ════════════════════════════════════════
+// STIMULUS ENGINE
+// ════════════════════════════════════════
+let animFrame     = null;
+let startTime     = null;
+let stimConfig    = [];
+let bgColor       = '#000000';
+let shape         = 'checkerboard';
+let showLabel     = true;
+let labelSize     = 16;
+let labelPos      = 'center';
+let labelColorMode= 'white';
 let timerInterval = null;
 
 function launchStimulus() {
-  if (boxes.length === 0) { alert('Add at least one stimulus box.'); return; }
   stimConfig = readConfig();
-  bgColor = document.getElementById('bg-color').value;
-  shape = document.getElementById('stim-shape').value;
+  if (stimConfig.length === 0) { alert('Enable at least one frequency.'); return; }
+
+  bgColor        = document.getElementById('bg-color').value;
+  shape          = document.getElementById('stim-shape').value;
+  showLabel      = document.getElementById('show-box-label').value === 'yes';
+  labelSize      = parseInt(document.getElementById('label-font-size').value);
+  labelPos       = document.getElementById('label-pos').value;
+  labelColorMode = document.getElementById('label-color').value;
+
   const showCrosshair = document.getElementById('show-crosshair').value === 'yes';
-  const showHud = document.getElementById('show-hud').value === 'yes';
+  const showHud       = document.getElementById('show-hud').value === 'yes';
 
-  // Validate frequencies
-  for (const b of stimConfig) {
-    if (!VALID_FREQS.includes(b.freq)) {
-      alert(`${b.freq} Hz is not a valid 60 Hz frequency.\nValid values: ${VALID_FREQS.join(', ')} Hz`);
-      return;
-    }
-  }
-
-  // Build HUD
   const hudBoxes = document.getElementById('hud-boxes');
   hudBoxes.innerHTML = '';
   stimConfig.forEach(b => {
     const item = document.createElement('div');
     item.className = 'hud-item';
-    item.innerHTML = `<div class="hud-dot" style="background:${b.color}"></div><span class="hud-freq">${b.freq} Hz</span>`;
+    item.innerHTML = `<div class="hud-dot" style="background:${b.color}"></div>`
+      + `<span class="hud-freq">${b.freq} Hz</span>`
+      + (b.label ? `<span class="hud-label">${b.label}</span>` : '');
     hudBoxes.appendChild(item);
   });
 
   document.getElementById('crosshair-svg').style.display = showCrosshair ? 'block' : 'none';
-  document.getElementById('stim-hud').style.display = showHud ? 'flex' : 'none';
-
-  // Show stimulus page
-  document.getElementById('setup-page').style.display = 'none';
+  document.getElementById('stim-hud').style.display      = showHud       ? 'flex'  : 'none';
+  document.getElementById('setup-page').style.display    = 'none';
   document.getElementById('stimulus-page').style.display = 'block';
 
-  // Resize canvas
   const canvas = document.getElementById('stimulus-canvas');
-  canvas.width = window.innerWidth;
-  canvas.height = window.innerHeight;
-
+  canvas.width = window.innerWidth; canvas.height = window.innerHeight;
   startTime = null;
   startTimer();
   animFrame = requestAnimationFrame(renderFrame);
@@ -638,102 +971,123 @@ function stopStimulus() {
   if (animFrame) cancelAnimationFrame(animFrame);
   clearInterval(timerInterval);
   document.getElementById('stimulus-page').style.display = 'none';
-  document.getElementById('setup-page').style.display = 'flex';
+  document.getElementById('setup-page').style.display    = 'flex';
 }
 
 function startTimer() {
-  const timerEl = document.getElementById('stim-timer');
+  const el = document.getElementById('stim-timer');
   const t0 = Date.now();
   clearInterval(timerInterval);
   timerInterval = setInterval(() => {
-    const s = Math.floor((Date.now() - t0) / 1000);
-    const mm = String(Math.floor(s / 60)).padStart(2, '0');
-    const ss = String(s % 60).padStart(2, '0');
-    timerEl.textContent = mm + ':' + ss;
+    const s = Math.floor((Date.now()-t0)/1000);
+    el.textContent = String(Math.floor(s/60)).padStart(2,'0') + ':' + String(s%60).padStart(2,'0');
   }, 500);
 }
 
-function renderFrame(timestamp) {
-  if (!startTime) startTime = timestamp;
-  const elapsed = (timestamp - startTime) / 1000; // seconds
+function renderFrame(ts) {
+  if (!startTime) startTime = ts;
+  const elapsed = (ts - startTime) / 1000;
+  const canvas  = document.getElementById('stimulus-canvas');
+  const ctx     = canvas.getContext('2d');
+  const W = canvas.width, H = canvas.height;
 
-  const canvas = document.getElementById('stimulus-canvas');
-  const ctx = canvas.getContext('2d');
-  const W = canvas.width;
-  const H = canvas.height;
-
-  // Background
   ctx.fillStyle = bgColor;
   ctx.fillRect(0, 0, W, H);
 
   stimConfig.forEach(b => {
-    // Is this frame ON or OFF?
-    // For frequency f, period = 1/f seconds
-    // Half-period = 1/(2f), so on for first half, off for second half
-    const phase = (elapsed * b.freq) % 1;
-    const isOn = phase < 0.5;
+    const isOn = ((elapsed * b.freq) % 1) < 0.5;
+    const cx = (b.x/100)*W, cy = (b.y/100)*H;
+    const px = cx - b.w/2,  py = cy - b.h/2;
 
-    const px = (b.x / 100) * W;
-    const py = (b.y / 100) * H;
-    const pw = b.w;
-    const ph = b.h;
-
+    // ── stimulus pattern ──
     if (shape === 'rect') {
-      ctx.fillStyle = isOn ? '#ffffff' : '#000000';
-      ctx.fillRect(px, py, pw, ph);
+      ctx.fillStyle = isOn ? '#fff' : '#000';
+      ctx.fillRect(px, py, b.w, b.h);
     } else if (shape === 'circle') {
       ctx.beginPath();
-      ctx.arc(px + pw/2, py + ph/2, Math.min(pw, ph)/2, 0, Math.PI*2);
-      ctx.fillStyle = isOn ? '#ffffff' : '#000000';
+      ctx.arc(cx, cy, Math.min(b.w,b.h)/2, 0, Math.PI*2);
+      ctx.fillStyle = isOn ? '#fff' : '#000';
       ctx.fill();
-    } else if (shape === 'checkerboard') {
-      // 8x8 checkerboard that inverts each cycle
-      const tileW = pw / 8;
-      const tileH = ph / 8;
-      for (let row = 0; row < 8; row++) {
-        for (let col = 0; col < 8; col++) {
-          const parity = (row + col) % 2;
-          const white = isOn ? (parity === 0) : (parity === 1);
-          ctx.fillStyle = white ? '#ffffff' : '#000000';
-          ctx.fillRect(px + col * tileW, py + row * tileH, tileW + 0.5, tileH + 0.5);
-        }
-      }
-    }
-
-    // Border
-    ctx.strokeStyle = b.color;
-    ctx.lineWidth = 2;
-    if (shape === 'circle') {
-      ctx.beginPath();
-      ctx.arc(px + pw/2, py + ph/2, Math.min(pw, ph)/2 + 2, 0, Math.PI*2);
-      ctx.stroke();
     } else {
-      ctx.strokeRect(px - 1, py - 1, pw + 2, ph + 2);
+      const T = 8, tw = b.w/T, th = b.h/T;
+      for (let r = 0; r < T; r++)
+        for (let c = 0; c < T; c++) {
+          const white = isOn ? ((r+c)%2===0) : ((r+c)%2===1);
+          ctx.fillStyle = white ? '#fff' : '#000';
+          ctx.fillRect(px+c*tw, py+r*th, tw+0.6, th+0.6);
+        }
     }
 
-    // Label
+    // ── border ──
+    ctx.strokeStyle = b.color; ctx.lineWidth = 2;
+    if (shape === 'circle') {
+      ctx.beginPath(); ctx.arc(cx, cy, Math.min(b.w,b.h)/2+2, 0, Math.PI*2); ctx.stroke();
+    } else {
+      ctx.strokeRect(px-1, py-1, b.w+2, b.h+2);
+    }
+
+    // ── freq tag above box ──
     ctx.fillStyle = b.color;
-    ctx.font = '600 11px Share Tech Mono, monospace';
-    ctx.fillText(b.freq + ' Hz', px + 4, py - 6);
+    ctx.font = '600 11px "Share Tech Mono",monospace';
+    ctx.textAlign = 'left'; ctx.textBaseline = 'alphabetic';
+    ctx.fillText(b.freq + ' Hz', px+4, py-6);
+
+    // ── custom label inside box ──
+    if (showLabel) {
+      const text = b.label || (b.freq + ' Hz');
+      let col = '#ffffff';
+      if (labelColorMode === 'box')   col = b.color;
+      if (labelColorMode === 'black') col = '#000000';
+
+      const lx = cx;
+      const ly = labelPos === 'top'    ? py + labelSize * 0.9
+               : labelPos === 'bottom' ? py + b.h - labelSize * 0.9
+               : cy;
+
+      ctx.save();
+      // clip to box shape
+      ctx.beginPath();
+      if (shape === 'circle') ctx.arc(cx, cy, Math.min(b.w,b.h)/2, 0, Math.PI*2);
+      else ctx.rect(px, py, b.w, b.h);
+      ctx.clip();
+
+      ctx.font = `bold ${labelSize}px "Share Tech Mono",monospace`;
+      ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+      const tw2 = ctx.measureText(text).width;
+
+      // semi-transparent pill background
+      ctx.fillStyle = 'rgba(0,0,0,0.5)';
+      ctx.beginPath();
+      if (ctx.roundRect) {
+        ctx.roundRect(lx - tw2/2 - 8, ly - labelSize/2 - 4, tw2+16, labelSize+8, 3);
+      } else {
+        ctx.rect(lx - tw2/2 - 8, ly - labelSize/2 - 4, tw2+16, labelSize+8);
+      }
+      ctx.fill();
+
+      ctx.fillStyle = col;
+      ctx.fillText(text, lx, ly);
+      ctx.restore();
+    }
   });
 
   animFrame = requestAnimationFrame(renderFrame);
 }
 
-// ── RESIZE ──
+// ════════════════════════════════════════
+// MISC EVENTS
+// ════════════════════════════════════════
 window.addEventListener('resize', () => {
+  updatePreview();
   if (document.getElementById('stimulus-page').style.display === 'block') {
-    const canvas = document.getElementById('stimulus-canvas');
-    canvas.width = window.innerWidth;
-    canvas.height = window.innerHeight;
+    const c = document.getElementById('stimulus-canvas');
+    c.width = window.innerWidth; c.height = window.innerHeight;
   }
 });
 
-// ── KEYBOARD SHORTCUT ──
 window.addEventListener('keydown', e => {
-  if (e.key === 'Escape' && document.getElementById('stimulus-page').style.display === 'block') {
+  if (e.key === 'Escape' && document.getElementById('stimulus-page').style.display === 'block')
     stopStimulus();
-  }
 });
 
 init();

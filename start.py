@@ -24,18 +24,30 @@ def start_mac():
     subprocess.Popen(pi_cmd, shell=True)
 
 def start_linux():
-    print("Detected OS: Linux")
-    # Using gnome-terminal (standard on Ubuntu and many other distros)
-    esp_cmd = 'gnome-terminal --title="Drone: ESP32" -- bash -c "node ESP32/ESP32_Firmware.js; exec bash"'
-    pi_cmd = 'gnome-terminal --title="Ground Station" -- bash -c "cd Raspberry_Pi && python3 Raspberry_Pi.py; exec bash"'
-
+    print("Detected OS: Linux (Headless/SSH mode)")
     try:
-        subprocess.Popen(esp_cmd, shell=True)
+        # Run directly in the current terminal, piping output to the same screen
+        # We use a list format for Popen which is safer and doesn't require shell=True
+        esp_process = subprocess.Popen(["node", "ESP32/ESP32_Firmware.js"])
         time.sleep(2)
-        subprocess.Popen(pi_cmd, shell=True)
+        pi_process = subprocess.Popen(["python3", "Raspberry_Pi.py"], cwd="Raspberry_Pi")
+
+        print("\n==================================================")
+        print("Both systems are running in this terminal.")
+        print("Press Ctrl+C to stop both processes.")
+        print("==================================================\n")
+
+        # Keep the main script alive so we see the output, and wait for them to finish
+        esp_process.wait()
+        pi_process.wait()
+
+    except KeyboardInterrupt:
+        # Catch Ctrl+C to cleanly kill both background processes before exiting
+        print("\nShutting down systems...")
+        esp_process.terminate()
+        pi_process.terminate()
     except Exception as e:
-        print(f"Failed to open Linux terminals: {e}")
-        print("Note: If you aren't using gnome-terminal, you may need to edit this script for xterm or konsole.")
+        print(f"Failed to start processes: {e}")
 
 if __name__ == "__main__":
     print("==================================================")

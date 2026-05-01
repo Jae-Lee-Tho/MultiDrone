@@ -16,5 +16,8 @@ dependencies = [
     "tqdm==4.67.3",
     "pyyaml==6.0.3",
     "srt==3.5.3",
-    "iso8601==2.1.0"
+    "iso8601==2.1.0",
+    "pylsl>=1.18.2",
+    "scikit-learn>=1.8.0",
+    "pygame>=2.6.1",
 ]

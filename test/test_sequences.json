@@ -1,15 +1,15 @@
 {
-  "tests": [
+  "tests":[
     {
-      "name": "Level 1 - Easy",
+      "name": "Level 1 - Easy (Baseline)",
       "sequence": [
         "FORWARD",
         "BACKWARD"
       ]
     },
     {
-      "name": "Level 2 - Medium",
-      "sequence": [
+      "name": "Level 2 - Medium (Repeated)",
+      "sequence":[
         "LEFT",
         "LEFT",
         "RIGHT",
@@ -17,22 +17,22 @@
       ]
     },
     {
-      "name": "Level 3 - Hard",
-      "sequence": [
-        "FORWARD",
-        "LEFT",
-        "RIGHT",
-        "BACKWARD"
-      ]
-    },
-    {
-      "name": "Level 4 - Expert",
-      "sequence": [
+      "name": "Level 3 - Hard (Box Pattern)",
+      "sequence":[
         "FORWARD",
         "LEFT",
         "BACKWARD",
+        "RIGHT"
+      ]
+    },
+    {
+      "name": "Level 4 - Expert (Fatigue & Precision)",
+      "sequence":[
+        "FORWARD",
         "RIGHT",
         "FORWARD",
+        "LEFT",
+        "BACKWARD",
         "RIGHT",
         "BACKWARD",
         "LEFT"
