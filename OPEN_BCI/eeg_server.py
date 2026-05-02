@@ -13,11 +13,15 @@ DATA_DIR      = "nakanishi_unfiltered_eeg/subject_8"
 FS            = 256.0
 CHUNK_SAMPLES = int(2.0 * FS)  # 512 samples = 2 seconds
 
+# Updated to match the new frequency mapping in main_bci.py
 COMMAND_MAPPING = {
-    'w': '9.25hz.npy',
-    's': '9.75hz.npy',
-    'a': '10.25hz.npy',
-    'd': '10.75hz.npy',
+    't': '9.25hz.npy',   # TAKEOFF
+    'q': '10.25hz.npy',  # STOP
+    'l': '11.25hz.npy',  # LAND
+    'd': '12.75hz.npy',  # RIGHT
+    'w': '13.75hz.npy',  # FORWARD
+    's': '14.25hz.npy',  # BACKWARD
+    'a': '14.75hz.npy',  # LEFT
 }
 
 # =============================================================
@@ -36,8 +40,8 @@ for key, filename in COMMAND_MAPPING.items():
         raise SystemExit(1)
     raw = np.load(path)
     eeg_data[key] = raw[:, 0:8, :]
-    print(f"  ✓  '{key}' → {filename}  "
-          f"({eeg_data[key].shape[0]} trials, {eeg_data[key].shape[2]} samples each)")
+    print(f"  ✓  '{key.upper()}' → {filename:<12} "
+          f"({eeg_data[key].shape[0]:>2} trials, {eeg_data[key].shape[2]} samples each)")
 
 # =============================================================
 #  INIT LSL
@@ -67,11 +71,18 @@ SILENCE = [0.0] * 8  # flat zero sample — no signal, no noise
 print("\n[3/3] Entering main streaming loop...\n")
 print("-" * 60)
 print("  Idle → streaming zeros (no signal)")
-print("  W / A / S / D  →  inject 2-second SSVEP burst")
-print("  ESC            →  shut down")
+print("  Press keys to inject 2-second SSVEP bursts:\n")
+print("    [T]      →  TAKEOFF   (9.25 Hz)")
+print("    [Q]      →  STOP      (10.25 Hz)")
+print("    [L]      →  LAND      (11.25 Hz)")
+print("    [W]      →  FORWARD   (13.75 Hz)")
+print("    [A]      →  LEFT      (14.75 Hz)")
+print("    [S]      →  BACKWARD  (14.25 Hz)")
+print("[D]      →  RIGHT     (12.75 Hz)\n")
+print("  [ESC]      →  Shut down server")
 print("-" * 60 + "\n")
 
-injection_buffer: list[list[float]] = []
+injection_buffer: list[list[float]] =[]
 next_sample_time = time.perf_counter()
 
 try:
@@ -85,7 +96,7 @@ try:
         if not injection_buffer:
             for key, filename in COMMAND_MAPPING.items():
                 if keyboard.is_pressed(key):
-                    print(f"[INJECT]  '{key.upper()}' → {filename}")
+                    print(f"[INJECT]  '{key.upper()}' pressed → streaming {filename}")
                     injection_buffer = load_random_snippet(key)
                     time.sleep(0.10)  # debounce
                     break

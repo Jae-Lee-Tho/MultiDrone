@@ -66,7 +66,7 @@ class DroneController:
         # ---------------------------------------------------------------------
 
         # --- General Experiment Settings ---
-        self.mode = ExperimentMode.BOTH       # ✏️ TUNE: Switch between VOICE_ONLY, EEG_ONLY, BOTH, PHYSICAL_RC
+        self.mode = ExperimentMode.EEG_ONLY       # ✏️ TUNE: Switch between VOICE_ONLY, EEG_ONLY, BOTH, PHYSICAL_RC
 
         # --- Drone Movement Dynamics ---
         self.action_duration = 1.0            # ✏️ TUNE: How long (seconds) a movement command (like FORWARD) lasts before auto-stopping
@@ -82,7 +82,7 @@ class DroneController:
         # --- EEG/SSVEP Signal Processing ---
         self.window_seconds = 2.0             # ✏️ TUNE: Length of EEG data fed to CCA. Larger = more accurate but slower to react (2.0s to 3.0s is ideal)
         self.window_step_fraction = 0.5       # ✏️ TUNE: How much the window slides forward. 0.5 means a 2.0s window updates every 1.0s. Lower = faster updates, higher CPU.
-        self.confidence_threshold = 0.50      # ✏️ TUNE: Minimum CCA score (0.0 to 1.0) to trigger a command. Lower = more false positives. Higher = harder to trigger.
+        self.confidence_threshold = 0.65      # ✏️ TUNE: Minimum CCA score (0.0 to 1.0) to trigger a command. Lower = more false positives. Higher = harder to trigger.
         self.num_harmonics = 3                # ✏️ TUNE: Number of harmonics for CCA reference signals. 2 or 3 is standard.
         self.notch_freq_hz = 60.0             # ✏️ TUNE: Powerline noise frequency. 60.0 for Americas/Japan. 50.0 for Europe/Asia.
 
@@ -241,13 +241,28 @@ class DroneController:
         samples = eeg_data.shape[0]
         best_freq, best_score = None, 0.0
 
+        # --- SAFETY CHECK: Prevent CCA from crashing on flatline data ---
+        # If the data is completely flat (variance near zero), CCA will divide by zero
+        # and throw a NaN ValueError. This happens when server.py sends idle 0.0s.
+        if np.allclose(eeg_data, 0.0, atol=1e-8) or np.var(eeg_data) < 1e-8:
+            self.latest_eeg_score = 0.0
+            return None, 0.0
+        # ----------------------------------------------------------------
+
         for freq in FREQ_TO_COMMAND:
             y_ref = self._generate_reference_signals(samples, sample_rate, freq)
+
             cca = CCA(n_components=1)
             cca.fit(eeg_data, y_ref)
             X_c, Y_c = cca.transform(eeg_data, y_ref)
 
-            score = float(np.corrcoef(X_c[:, 0], Y_c[:, 0])[0, 1])
+            # Catch correlation of flat signals that somehow slipped through
+            with np.errstate(divide='ignore', invalid='ignore'):
+                score = float(np.corrcoef(X_c[:, 0], Y_c[:, 0])[0, 1])
+
+            if np.isnan(score):
+                score = 0.0
+
             if score > best_score:
                 best_score = score
                 best_freq = freq
@@ -296,6 +311,16 @@ class DroneController:
                     print(f"[EEG] Detected: {best_freq:>5.2f} Hz  (Score: {score:.3f})  →  {cmd.value}")
                     self.active_eeg_cmd = cmd
                     self.active_eeg_time = time.time()
+
+                    # -----------------------------------------------------------------
+                    # FIX: Flush the buffer entirely!
+                    # Instead of stepping forward by half a window, we clear it out.
+                    # This creates an automatic 2.0-second "cooldown" where the system
+                    # is forced to wait for fresh, new brainwaves before triggering again.
+                    # -----------------------------------------------------------------
+                    data_buffer =[]
+                else:
+                    # Only slide the window by the step fraction if NOTHING was detected
                     data_buffer = data_buffer[step_samples:]
 
             time.sleep(0.01)

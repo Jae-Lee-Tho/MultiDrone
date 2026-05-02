@@ -87,7 +87,7 @@ function dispatchCommand(cmd, payload) {
         // Roll: 1500 -> 0 degrees, 1600 -> +10.0 degrees (stored as 100)
         const simRoll = (currentRc[0] - 1500);
         const simPitch = -(currentRc[1] - 1500); // Forward pitch drops nose
-        const simYaw = (currentRc[3] - 1500);
+        const simYaw = (currentRc[2] - 1500);
 
         const buf = Buffer.alloc(6);
         buf.writeInt16LE(simRoll, 0);
@@ -102,7 +102,7 @@ function dispatchCommand(cmd, payload) {
         // mAh drawn placeholder
         buf.writeUInt16LE(0, 1);
         // Simulate Amperage draw based on throttle and movement
-        const baseCurrent = (currentRc[2] > 1100) ? 1500 : 50; // 15A flying, 0.5A idle
+        const baseCurrent = (currentRc[3] > 1100) ? 1500 : 50; // 15A flying, 0.5A idle
         const moveCurrent = Math.abs(currentRc[1] - 1500) + Math.abs(currentRc[0] - 1500);
         buf.writeUInt16LE(baseCurrent + moveCurrent, 3); // Amperage (in 0.01A steps)
 
@@ -138,8 +138,8 @@ function renderChannels(channels) {
     console.log(`[MSP] SET_RAW_RC packet decoded OK`);
     console.log(`[CH1] Roll     : ${channels[0] ?? '---'}`);
     console.log(`[CH2] Pitch    : ${channels[1] ?? '---'}`);
-    console.log(`[CH3] Throttle : ${channels[2] ?? '---'}`);
-    console.log(`[CH4] Yaw      : ${channels[3] ?? '---'}`);
+    console.log(`[CH3] Yaw      : ${channels[2] ?? '---'}`);
+    console.log(`[CH4] Throttle : ${channels[3] ?? '---'}`);
     console.log(`[CH5] Arm/Aux1 : ${channels[4] ?? '---'}`);
 }
 
