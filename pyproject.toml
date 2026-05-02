@@ -20,4 +20,8 @@ dependencies = [
     "pylsl>=1.18.2",
     "scikit-learn>=1.8.0",
     "pygame>=2.6.1",
+    "moabb>=1.5.0",
+    "opencv-python>=4.13.0.92",
+    "mediapipe>=0.10.35",
+    "keyboard>=0.13.5",
 ]
