@@ -66,7 +66,7 @@ class DroneController:
         # ---------------------------------------------------------------------
 
         # --- General Experiment Settings ---
-        self.mode = ExperimentMode.EEG_ONLY       # ✏️ TUNE: Switch between VOICE_ONLY, EEG_ONLY, BOTH, PHYSICAL_RC
+        self.mode = ExperimentMode.BOTH    # ✏️ TUNE: Switch between VOICE_ONLY, EEG_ONLY, BOTH, PHYSICAL_RC
 
         # --- Drone Movement Dynamics ---
         self.action_duration = 1.0            # ✏️ TUNE: How long (seconds) a movement command (like FORWARD) lasts before auto-stopping
@@ -77,7 +77,7 @@ class DroneController:
         self.command_expiry_seconds = 2.5     # ✏️ TUNE: Max time (seconds) to wait for Voice and EEG to match. If Voice is heard, how long to wait for EEG?
 
         # --- Network Settings ---
-        self.esp32_ip = "127.0.0.1"           # ✏️ TUNE/REQUIRED: Change this to the actual Wi-Fi IP address printed by your ESP32
+        self.esp32_ip = "192.168.4.1"           # ✏️ TUNE/REQUIRED: Change this to the actual Wi-Fi IP address printed by your ESP32
 
         # --- EEG/SSVEP Signal Processing ---
         self.window_seconds = 2.0             # ✏️ TUNE: Length of EEG data fed to CCA. Larger = more accurate but slower to react (2.0s to 3.0s is ideal)

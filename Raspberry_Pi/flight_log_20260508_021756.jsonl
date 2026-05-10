@@ -1,0 +1,114 @@
+{"type": "attitude", "roll": -3.5, "pitch": -0.9, "yaw": 83, "system_time": 1778231876.898227}
+{"type": "rc", "roll": 1462, "pitch": 1462, "throttle": 1462, "yaw": 885, "system_time": 1778231876.8995159}
+{"type": "analog", "vbat": 23.6, "current": 0.0, "system_time": 1778231876.899659}
+{"type": "attitude", "roll": -3.5, "pitch": -0.9, "yaw": 83, "system_time": 1778231876.899723}
+{"type": "rc", "roll": 1462, "pitch": 1462, "throttle": 1462, "yaw": 885, "system_time": 1778231876.8997781}
+{"type": "attitude", "roll": -3.5, "pitch": -0.9, "yaw": 83, "system_time": 1778231876.9288168}
+{"type": "rc", "roll": 1462, "pitch": 1462, "throttle": 1462, "yaw": 885, "system_time": 1778231876.952018}
+{"type": "attitude", "roll": -3.5, "pitch": -0.9, "yaw": 84, "system_time": 1778231877.765888}
+{"type": "analog", "vbat": 23.6, "current": 0.0, "system_time": 1778231877.845036}
+{"type": "attitude", "roll": -3.5, "pitch": -0.9, "yaw": 84, "system_time": 1778231877.853194}
+{"type": "rc", "roll": 1500, "pitch": 1500, "throttle": 1000, "yaw": 1500, "system_time": 1778231877.866244}
+{"type": "attitude", "roll": -3.5, "pitch": -0.9, "yaw": 84, "system_time": 1778231878.579763}
+{"type": "attitude", "roll": -3.5, "pitch": -0.9, "yaw": 84, "system_time": 1778231878.6708312}
+{"type": "rc", "roll": 1500, "pitch": 1500, "throttle": 1000, "yaw": 1500, "system_time": 1778231878.68385}
+{"type": "attitude", "roll": -3.5, "pitch": -0.9, "yaw": 84, "system_time": 1778231878.8690891}
+{"type": "rc", "roll": 1500, "pitch": 1500, "throttle": 1000, "yaw": 1500, "system_time": 1778231878.88763}
+{"type": "attitude", "roll": -3.5, "pitch": -0.9, "yaw": 84, "system_time": 1778231878.9902458}
+{"type": "attitude", "roll": -3.5, "pitch": -0.9, "yaw": 84, "system_time": 1778231879.080426}
+{"type": "rc", "roll": 1500, "pitch": 1500, "throttle": 1000, "yaw": 1500, "system_time": 1778231879.094163}
+{"type": "attitude", "roll": -3.5, "pitch": -0.9, "yaw": 84, "system_time": 1778231879.1850328}
+{"type": "attitude", "roll": -3.5, "pitch": -0.9, "yaw": 84, "system_time": 1778231879.283933}
+{"type": "rc", "roll": 1500, "pitch": 1500, "throttle": 1000, "yaw": 1500, "system_time": 1778231879.2973828}
+{"type": "attitude", "roll": -3.5, "pitch": -0.9, "yaw": 84, "system_time": 1778231880.3020768}
+{"type": "attitude", "roll": -3.5, "pitch": -0.9, "yaw": 84, "system_time": 1778231881.4107141}
+{"type": "rc", "roll": 1500, "pitch": 1500, "throttle": 1000, "yaw": 1500, "system_time": 1778231881.42416}
+{"type": "attitude", "roll": -3.5, "pitch": -0.9, "yaw": 84, "system_time": 1778231881.511164}
+{"type": "rc", "roll": 1500, "pitch": 1500, "throttle": 1000, "yaw": 1500, "system_time": 1778231881.523644}
+{"type": "attitude", "roll": -3.5, "pitch": -0.9, "yaw": 84, "system_time": 1778231882.235069}
+{"type": "attitude", "roll": -3.5, "pitch": -0.9, "yaw": 84, "system_time": 1778231882.334767}
+{"type": "attitude", "roll": -3.5, "pitch": -0.9, "yaw": 84, "system_time": 1778231883.340582}
+{"type": "rc", "roll": 1500, "pitch": 1500, "throttle": 1000, "yaw": 1500, "system_time": 1778231883.3530612}
+{"type": "attitude", "roll": -3.5, "pitch": -0.9, "yaw": 84, "system_time": 1778231883.453687}
+{"type": "attitude", "roll": -3.5, "pitch": -0.9, "yaw": 84, "system_time": 1778231883.546452}
+{"type": "rc", "roll": 1500, "pitch": 1500, "throttle": 1000, "yaw": 1500, "system_time": 1778231883.558938}
+{"type": "attitude", "roll": -3.5, "pitch": -0.9, "yaw": 84, "system_time": 1778231883.654633}
+{"type": "analog", "vbat": 23.7, "current": 0.06, "system_time": 1778231883.865102}
+{"type": "attitude", "roll": -3.5, "pitch": -0.9, "yaw": 84, "system_time": 1778231884.569777}
+{"type": "attitude", "roll": -3.5, "pitch": -0.9, "yaw": 84, "system_time": 1778231884.671613}
+{"type": "attitude", "roll": -3.5, "pitch": -0.9, "yaw": 84, "system_time": 1778231884.862813}
+{"type": "rc", "roll": 1500, "pitch": 1500, "throttle": 1000, "yaw": 1500, "system_time": 1778231884.876676}
+{"type": "attitude", "roll": -3.5, "pitch": -0.9, "yaw": 84, "system_time": 1778231884.976012}
+{"type": "attitude", "roll": -3.5, "pitch": -0.9, "yaw": 84, "system_time": 1778231885.08064}
+{"type": "attitude", "roll": -3.5, "pitch": -0.9, "yaw": 84, "system_time": 1778231885.171695}
+{"type": "rc", "roll": 1500, "pitch": 1500, "throttle": 1000, "yaw": 1500, "system_time": 1778231885.183789}
+{"type": "attitude", "roll": -3.5, "pitch": -0.9, "yaw": 84, "system_time": 1778231885.376251}
+{"type": "rc", "roll": 1500, "pitch": 1500, "throttle": 1000, "yaw": 1500, "system_time": 1778231885.389281}
+{"type": "attitude", "roll": -3.5, "pitch": -0.9, "yaw": 84, "system_time": 1778231886.189108}
+{"type": "rc", "roll": 1500, "pitch": 1500, "throttle": 1000, "yaw": 1500, "system_time": 1778231886.201378}
+{"type": "attitude", "roll": -3.5, "pitch": -0.9, "yaw": 84, "system_time": 1778231887.099688}
+{"type": "rc", "roll": 1500, "pitch": 1500, "throttle": 1000, "yaw": 1500, "system_time": 1778231887.118468}
+{"type": "attitude", "roll": -3.5, "pitch": -0.9, "yaw": 84, "system_time": 1778231887.916466}
+{"type": "attitude", "roll": -3.5, "pitch": -0.9, "yaw": 84, "system_time": 1778231888.020422}
+{"type": "attitude", "roll": -3.5, "pitch": -0.9, "yaw": 84, "system_time": 1778231888.1140292}
+{"type": "rc", "roll": 1500, "pitch": 1500, "throttle": 1000, "yaw": 1500, "system_time": 1778231888.130024}
+{"type": "attitude", "roll": -3.5, "pitch": -0.9, "yaw": 84, "system_time": 1778231888.422234}
+{"type": "rc", "roll": 1500, "pitch": 1500, "throttle": 1000, "yaw": 1500, "system_time": 1778231888.435342}
+{"type": "attitude", "roll": -3.5, "pitch": -0.9, "yaw": 84, "system_time": 1778231888.636479}
+{"type": "attitude", "roll": -3.5, "pitch": -0.9, "yaw": 84, "system_time": 1778231889.648632}
+{"type": "analog", "vbat": 23.6, "current": 0.06, "system_time": 1778231890.386622}
+{"type": "attitude", "roll": -3.5, "pitch": -0.9, "yaw": 84, "system_time": 1778231890.8567889}
+{"type": "rc", "roll": 1500, "pitch": 1500, "throttle": 1000, "yaw": 1500, "system_time": 1778231890.871899}
+{"type": "attitude", "roll": -3.5, "pitch": -0.9, "yaw": 84, "system_time": 1778231890.967691}
+{"type": "attitude", "roll": -3.5, "pitch": -0.9, "yaw": 84, "system_time": 1778231891.059393}
+{"type": "rc", "roll": 1500, "pitch": 1500, "throttle": 1000, "yaw": 1500, "system_time": 1778231891.074778}
+{"type": "attitude", "roll": -3.5, "pitch": -0.9, "yaw": 84, "system_time": 1778231891.172023}
+{"type": "analog", "vbat": 23.7, "current": 0.0, "system_time": 1778231891.391527}
+{"type": "attitude", "roll": -3.5, "pitch": -0.9, "yaw": 84, "system_time": 1778231891.4637618}
+{"type": "rc", "roll": 1500, "pitch": 1500, "throttle": 1000, "yaw": 1500, "system_time": 1778231891.474841}
+{"type": "attitude", "roll": -3.5, "pitch": -0.9, "yaw": 84, "system_time": 1778231891.5836742}
+{"type": "attitude", "roll": -3.5, "pitch": -0.9, "yaw": 84, "system_time": 1778231892.6893802}
+{"type": "rc", "roll": 1500, "pitch": 1500, "throttle": 1000, "yaw": 1500, "system_time": 1778231892.7018392}
+{"type": "attitude", "roll": -3.5, "pitch": -0.9, "yaw": 84, "system_time": 1778231893.814549}
+{"type": "attitude", "roll": -3.5, "pitch": -0.9, "yaw": 84, "system_time": 1778231893.905641}
+{"type": "rc", "roll": 1500, "pitch": 1500, "throttle": 1000, "yaw": 1500, "system_time": 1778231893.917759}
+{"type": "attitude", "roll": -3.5, "pitch": -0.9, "yaw": 84, "system_time": 1778231894.0083818}
+{"type": "rc", "roll": 1500, "pitch": 1500, "throttle": 1000, "yaw": 1500, "system_time": 1778231894.021649}
+{"type": "attitude", "roll": -3.5, "pitch": -0.9, "yaw": 84, "system_time": 1778231894.117076}
+{"type": "analog", "vbat": 23.6, "current": 0.13, "system_time": 1778231895.405832}
+{"type": "analog", "vbat": 23.6, "current": 0.0, "system_time": 1778231896.924385}
+{"type": "attitude", "roll": -3.5, "pitch": -0.9, "yaw": 84, "system_time": 1778231897.167979}
+{"type": "attitude", "roll": -3.5, "pitch": -0.9, "yaw": 84, "system_time": 1778231897.260489}
+{"type": "rc", "roll": 1500, "pitch": 1500, "throttle": 1000, "yaw": 1500, "system_time": 1778231897.273472}
+{"type": "attitude", "roll": -3.5, "pitch": -0.9, "yaw": 84, "system_time": 1778231897.3621}
+{"type": "rc", "roll": 1500, "pitch": 1500, "throttle": 1000, "yaw": 1500, "system_time": 1778231897.3776991}
+{"type": "attitude", "roll": -3.5, "pitch": -0.9, "yaw": 84, "system_time": 1778231897.7597382}
+{"type": "rc", "roll": 1500, "pitch": 1500, "throttle": 1000, "yaw": 1500, "system_time": 1778231897.77212}
+{"type": "attitude", "roll": -3.5, "pitch": -0.9, "yaw": 84, "system_time": 1778231898.6825721}
+{"type": "attitude", "roll": -3.5, "pitch": -0.9, "yaw": 84, "system_time": 1778231898.796777}
+{"type": "attitude", "roll": -3.5, "pitch": -0.9, "yaw": 84, "system_time": 1778231898.8772302}
+{"type": "rc", "roll": 1500, "pitch": 1500, "throttle": 1000, "yaw": 1500, "system_time": 1778231898.8914828}
+{"type": "attitude", "roll": -3.5, "pitch": -0.9, "yaw": 84, "system_time": 1778231898.98809}
+{"type": "attitude", "roll": -3.5, "pitch": -0.9, "yaw": 84, "system_time": 1778231899.081646}
+{"type": "rc", "roll": 1500, "pitch": 1500, "throttle": 1000, "yaw": 1500, "system_time": 1778231899.09374}
+{"type": "attitude", "roll": -3.5, "pitch": -0.9, "yaw": 84, "system_time": 1778231899.184861}
+{"type": "rc", "roll": 1500, "pitch": 1500, "throttle": 1000, "yaw": 1500, "system_time": 1778231899.1979241}
+{"type": "attitude", "roll": -3.5, "pitch": -0.9, "yaw": 84, "system_time": 1778231900.81347}
+{"type": "attitude", "roll": -3.5, "pitch": -0.9, "yaw": 84, "system_time": 1778231900.915156}
+{"type": "rc", "roll": 1500, "pitch": 1500, "throttle": 1000, "yaw": 1500, "system_time": 1778231900.92733}
+{"type": "attitude", "roll": -3.5, "pitch": -0.9, "yaw": 84, "system_time": 1778231901.005258}
+{"type": "rc", "roll": 1500, "pitch": 1500, "throttle": 1000, "yaw": 1500, "system_time": 1778231901.020721}
+{"type": "analog", "vbat": 23.6, "current": 0.06, "system_time": 1778231901.435783}
+{"type": "attitude", "roll": -3.5, "pitch": -0.9, "yaw": 84, "system_time": 1778231901.9236548}
+{"type": "rc", "roll": 1500, "pitch": 1500, "throttle": 1000, "yaw": 1500, "system_time": 1778231901.9395032}
+{"type": "attitude", "roll": -3.5, "pitch": -0.9, "yaw": 84, "system_time": 1778231902.128433}
+{"type": "rc", "roll": 1500, "pitch": 1500, "throttle": 1000, "yaw": 1500, "system_time": 1778231902.140789}
+{"type": "attitude", "roll": -3.5, "pitch": -0.9, "yaw": 84, "system_time": 1778231902.229065}
+{"type": "attitude", "roll": -3.5, "pitch": -0.9, "yaw": 84, "system_time": 1778231903.546924}
+{"type": "rc", "roll": 1500, "pitch": 1500, "throttle": 1000, "yaw": 1500, "system_time": 1778231903.5574589}
+{"type": "attitude", "roll": -3.5, "pitch": -0.9, "yaw": 84, "system_time": 1778231903.66142}
+{"type": "attitude", "roll": -3.5, "pitch": -0.9, "yaw": 84, "system_time": 1778231903.760389}
+{"type": "attitude", "roll": -3.5, "pitch": -0.9, "yaw": 84, "system_time": 1778231904.058091}
+{"type": "rc", "roll": 1500, "pitch": 1500, "throttle": 1000, "yaw": 1500, "system_time": 1778231904.071397}
+{"type": "attitude", "roll": -3.5, "pitch": -0.9, "yaw": 84, "system_time": 1778231905.9917881}
+{"type": "analog", "vbat": 23.6, "current": 0.06, "system_time": 1778231906.458037}

@@ -3,7 +3,7 @@ import os
 import time
 import random
 import numpy as np
-import keyboard
+from pynput import keyboard as pynput_keyboard
 from pylsl import StreamInfo, StreamOutlet
 
 # =============================================================
@@ -66,6 +66,33 @@ def load_random_snippet(key: str) -> list[list[float]]:
 SILENCE = [0.0] * 8  # flat zero sample — no signal, no noise
 
 # =============================================================
+#  KEYBOARD LISTENER (pynput — macOS-friendly, no sudo needed)
+# =============================================================
+pressed_keys: set[str] = set()
+should_exit = False
+
+def on_press(key):
+    global should_exit
+    if key == pynput_keyboard.Key.esc:
+        should_exit = True
+        return
+    try:
+        if hasattr(key, 'char') and key.char:
+            pressed_keys.add(key.char.lower())
+    except AttributeError:
+        pass
+
+def on_release(key):
+    try:
+        if hasattr(key, 'char') and key.char:
+            pressed_keys.discard(key.char.lower())
+    except AttributeError:
+        pass
+
+listener = pynput_keyboard.Listener(on_press=on_press, on_release=on_release)
+listener.start()
+
+# =============================================================
 #  MAIN LOOP
 # =============================================================
 print("\n[3/3] Entering main streaming loop...\n")
@@ -78,27 +105,27 @@ print("    [L]      →  LAND      (11.25 Hz)")
 print("    [W]      →  FORWARD   (13.75 Hz)")
 print("    [A]      →  LEFT      (14.75 Hz)")
 print("    [S]      →  BACKWARD  (14.25 Hz)")
-print("[D]      →  RIGHT     (12.75 Hz)\n")
+print("    [D]      →  RIGHT     (12.75 Hz)\n")
 print("  [ESC]      →  Shut down server")
 print("-" * 60 + "\n")
 
-injection_buffer: list[list[float]] =[]
+injection_buffer: list[list[float]] = []
 next_sample_time = time.perf_counter()
 
 try:
     while True:
 
-        if keyboard.is_pressed('esc'):
+        if should_exit:
             print("\n[SHUTDOWN] ESC pressed.")
             break
 
         # Inject on keypress, only when idle
         if not injection_buffer:
             for key, filename in COMMAND_MAPPING.items():
-                if keyboard.is_pressed(key):
+                if key in pressed_keys:
                     print(f"[INJECT]  '{key.upper()}' pressed → streaming {filename}")
                     injection_buffer = load_random_snippet(key)
-                    time.sleep(0.10)  # debounce
+                    time.sleep(0.20)  # debounce
                     break
 
         # Build sample
@@ -120,3 +147,5 @@ try:
 
 except KeyboardInterrupt:
     print("\n[SHUTDOWN] Stopped.")
+finally:
+    listener.stop()

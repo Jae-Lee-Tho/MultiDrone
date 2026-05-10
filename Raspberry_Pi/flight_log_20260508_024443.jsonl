@@ -1,0 +1,124 @@
+{"type": "attitude", "roll": 0.1, "pitch": 0.2, "yaw": 6, "system_time": 1778233483.292099}
+{"type": "rc", "roll": 1462, "pitch": 1462, "throttle": 1462, "yaw": 885, "system_time": 1778233483.292452}
+{"type": "attitude", "roll": 0.1, "pitch": 0.2, "yaw": 6, "system_time": 1778233483.292589}
+{"type": "rc", "roll": 1462, "pitch": 1462, "throttle": 1462, "yaw": 885, "system_time": 1778233483.292654}
+{"type": "attitude", "roll": 0.1, "pitch": 0.2, "yaw": 6, "system_time": 1778233483.292704}
+{"type": "rc", "roll": 1462, "pitch": 1462, "throttle": 1462, "yaw": 885, "system_time": 1778233483.292755}
+{"type": "analog", "vbat": 23.6, "current": 0.06, "system_time": 1778233483.3038452}
+{"type": "attitude", "roll": 0.1, "pitch": 0.2, "yaw": 6, "system_time": 1778233483.373312}
+{"type": "rc", "roll": 1462, "pitch": 1462, "throttle": 1462, "yaw": 885, "system_time": 1778233483.386494}
+{"type": "attitude", "roll": 0.1, "pitch": 0.2, "yaw": 6, "system_time": 1778233484.315854}
+{"type": "attitude", "roll": 0.1, "pitch": 0.2, "yaw": 6, "system_time": 1778233484.4062688}
+{"type": "rc", "roll": 1500, "pitch": 1500, "throttle": 1500, "yaw": 1000, "system_time": 1778233484.4177501}
+{"type": "attitude", "roll": 0.1, "pitch": 0.2, "yaw": 6, "system_time": 1778233485.4330308}
+{"type": "attitude", "roll": 0.1, "pitch": 0.2, "yaw": 6, "system_time": 1778233485.51937}
+{"type": "rc", "roll": 1500, "pitch": 1500, "throttle": 1500, "yaw": 1000, "system_time": 1778233485.5333838}
+{"type": "attitude", "roll": 0.1, "pitch": 0.2, "yaw": 6, "system_time": 1778233487.453522}
+{"type": "attitude", "roll": 0.1, "pitch": 0.2, "yaw": 6, "system_time": 1778233487.654539}
+{"type": "rc", "roll": 1500, "pitch": 1500, "throttle": 1500, "yaw": 1000, "system_time": 1778233487.6667788}
+{"type": "analog", "vbat": 23.5, "current": 0.0, "system_time": 1778233487.843967}
+{"type": "attitude", "roll": 0.1, "pitch": 0.2, "yaw": 6, "system_time": 1778233488.672506}
+{"type": "attitude", "roll": 0.1, "pitch": 0.2, "yaw": 6, "system_time": 1778233488.873236}
+{"type": "rc", "roll": 1500, "pitch": 1500, "throttle": 1500, "yaw": 1390, "system_time": 1778233488.8852649}
+{"type": "attitude", "roll": 0.1, "pitch": 0.2, "yaw": 6, "system_time": 1778233489.388705}
+{"type": "attitude", "roll": 0.1, "pitch": 0.2, "yaw": 6, "system_time": 1778233489.491963}
+{"type": "attitude", "roll": 0.1, "pitch": 0.2, "yaw": 6, "system_time": 1778233489.695103}
+{"type": "attitude", "roll": 0.1, "pitch": 0.2, "yaw": 6, "system_time": 1778233489.8952582}
+{"type": "analog", "vbat": 23.5, "current": 0.06, "system_time": 1778233490.340619}
+{"type": "attitude", "roll": 0.1, "pitch": 0.2, "yaw": 6, "system_time": 1778233492.4276721}
+{"type": "attitude", "roll": 0.1, "pitch": 0.2, "yaw": 6, "system_time": 1778233492.627975}
+{"type": "attitude", "roll": 0.1, "pitch": 0.2, "yaw": 6, "system_time": 1778233492.827083}
+{"type": "attitude", "roll": 0.1, "pitch": 0.2, "yaw": 6, "system_time": 1778233493.233114}
+{"type": "attitude", "roll": 0.1, "pitch": 0.2, "yaw": 6, "system_time": 1778233493.445898}
+{"type": "attitude", "roll": 0.1, "pitch": 0.2, "yaw": 6, "system_time": 1778233493.749434}
+{"type": "attitude", "roll": 0.1, "pitch": 0.2, "yaw": 6, "system_time": 1778233493.847708}
+{"type": "attitude", "roll": 0.1, "pitch": 0.2, "yaw": 6, "system_time": 1778233493.950646}
+{"type": "attitude", "roll": 0.1, "pitch": 0.2, "yaw": 6, "system_time": 1778233494.246953}
+{"type": "rc", "roll": 1500, "pitch": 1500, "throttle": 1500, "yaw": 1599, "system_time": 1778233494.259524}
+{"type": "attitude", "roll": 0.1, "pitch": 0.2, "yaw": 6, "system_time": 1778233494.763828}
+{"type": "attitude", "roll": 0.1, "pitch": 0.2, "yaw": 6, "system_time": 1778233495.1697311}
+{"type": "attitude", "roll": 0.1, "pitch": 0.2, "yaw": 6, "system_time": 1778233495.676223}
+{"type": "rc", "roll": 1500, "pitch": 1500, "throttle": 1500, "yaw": 1599, "system_time": 1778233495.688614}
+{"type": "analog", "vbat": 23.5, "current": 0.0, "system_time": 1778233496.877965}
+{"type": "attitude", "roll": 0.1, "pitch": 0.2, "yaw": 6, "system_time": 1778233496.898517}
+{"type": "attitude", "roll": 0.1, "pitch": 0.2, "yaw": 6, "system_time": 1778233497.1914911}
+{"type": "rc", "roll": 1500, "pitch": 1500, "throttle": 1500, "yaw": 1599, "system_time": 1778233497.208035}
+{"type": "attitude", "roll": 0.1, "pitch": 0.2, "yaw": 6, "system_time": 1778233497.80323}
+{"type": "attitude", "roll": 0.1, "pitch": 0.2, "yaw": 6, "system_time": 1778233497.913568}
+{"type": "attitude", "roll": 0.1, "pitch": 0.2, "yaw": 6, "system_time": 1778233498.5114791}
+{"type": "analog", "vbat": 23.5, "current": 0.06, "system_time": 1778233499.874063}
+{"type": "attitude", "roll": 0.1, "pitch": 0.2, "yaw": 6, "system_time": 1778233500.939661}
+{"type": "rc", "roll": 1500, "pitch": 1500, "throttle": 1500, "yaw": 1599, "system_time": 1778233500.9552681}
+{"type": "attitude", "roll": 0.1, "pitch": 0.2, "yaw": 6, "system_time": 1778233502.065547}
+{"type": "analog", "vbat": 23.5, "current": 0.0, "system_time": 1778233502.390435}
+{"type": "attitude", "roll": 0.1, "pitch": 0.2, "yaw": 6, "system_time": 1778233504.405827}
+{"type": "attitude", "roll": 0.1, "pitch": 0.2, "yaw": 6, "system_time": 1778233504.4961438}
+{"type": "analog", "vbat": 23.5, "current": 0.06, "system_time": 1778233504.908541}
+{"type": "attitude", "roll": 0.1, "pitch": 0.2, "yaw": 6, "system_time": 1778233505.214135}
+{"type": "attitude", "roll": 0.1, "pitch": 0.2, "yaw": 6, "system_time": 1778233505.406246}
+{"type": "attitude", "roll": 0.1, "pitch": 0.2, "yaw": 6, "system_time": 1778233505.8240461}
+{"type": "attitude", "roll": 0.1, "pitch": 0.2, "yaw": 6, "system_time": 1778233506.015936}
+{"type": "rc", "roll": 1500, "pitch": 1500, "throttle": 1500, "yaw": 1599, "system_time": 1778233506.028939}
+{"type": "attitude", "roll": 0.1, "pitch": 0.2, "yaw": 6, "system_time": 1778233506.3193989}
+{"type": "rc", "roll": 1500, "pitch": 1500, "throttle": 1500, "yaw": 1599, "system_time": 1778233506.331983}
+{"type": "attitude", "roll": 0.1, "pitch": 0.2, "yaw": 6, "system_time": 1778233506.4187589}
+{"type": "rc", "roll": 1500, "pitch": 1500, "throttle": 1500, "yaw": 1599, "system_time": 1778233506.435008}
+{"type": "attitude", "roll": 0.1, "pitch": 0.2, "yaw": 6, "system_time": 1778233506.941943}
+{"type": "attitude", "roll": 0.1, "pitch": 0.2, "yaw": 6, "system_time": 1778233507.534695}
+{"type": "rc", "roll": 1500, "pitch": 1500, "throttle": 1500, "yaw": 1599, "system_time": 1778233507.556988}
+{"type": "attitude", "roll": 0.1, "pitch": 0.2, "yaw": 6, "system_time": 1778233507.9421701}
+{"type": "rc", "roll": 1500, "pitch": 1500, "throttle": 1500, "yaw": 1599, "system_time": 1778233507.9538682}
+{"type": "attitude", "roll": 0.1, "pitch": 0.2, "yaw": 6, "system_time": 1778233508.1642728}
+{"type": "attitude", "roll": 0.1, "pitch": 0.2, "yaw": 6, "system_time": 1778233508.2659998}
+{"type": "attitude", "roll": 0.1, "pitch": 0.2, "yaw": 6, "system_time": 1778233508.765416}
+{"type": "attitude", "roll": 0.1, "pitch": 0.2, "yaw": 6, "system_time": 1778233508.875432}
+{"type": "attitude", "roll": 0.1, "pitch": 0.2, "yaw": 6, "system_time": 1778233508.981857}
+{"type": "attitude", "roll": 0.1, "pitch": 0.2, "yaw": 6, "system_time": 1778233509.0618591}
+{"type": "rc", "roll": 1500, "pitch": 1500, "throttle": 1500, "yaw": 1599, "system_time": 1778233509.0748968}
+{"type": "attitude", "roll": 0.1, "pitch": 0.2, "yaw": 6, "system_time": 1778233509.386112}
+{"type": "attitude", "roll": 0.1, "pitch": 0.2, "yaw": 6, "system_time": 1778233509.688311}
+{"type": "attitude", "roll": 0.1, "pitch": 0.2, "yaw": 6, "system_time": 1778233510.0829089}
+{"type": "rc", "roll": 1500, "pitch": 1500, "throttle": 1500, "yaw": 1599, "system_time": 1778233510.0952508}
+{"type": "attitude", "roll": 0.1, "pitch": 0.2, "yaw": 6, "system_time": 1778233510.1861382}
+{"type": "rc", "roll": 1500, "pitch": 1500, "throttle": 1500, "yaw": 1599, "system_time": 1778233510.199245}
+{"type": "attitude", "roll": 0.1, "pitch": 0.2, "yaw": 6, "system_time": 1778233510.3892648}
+{"type": "attitude", "roll": 0.1, "pitch": 0.2, "yaw": 6, "system_time": 1778233510.490189}
+{"type": "rc", "roll": 1500, "pitch": 1500, "throttle": 1500, "yaw": 1599, "system_time": 1778233510.503813}
+{"type": "attitude", "roll": 0.1, "pitch": 0.2, "yaw": 6, "system_time": 1778233511.2057228}
+{"type": "rc", "roll": 1500, "pitch": 1500, "throttle": 1500, "yaw": 1599, "system_time": 1778233511.2213278}
+{"type": "attitude", "roll": 0.1, "pitch": 0.2, "yaw": 6, "system_time": 1778233511.418787}
+{"type": "attitude", "roll": 0.1, "pitch": 0.2, "yaw": 6, "system_time": 1778233511.509544}
+{"type": "rc", "roll": 1500, "pitch": 1500, "throttle": 1500, "yaw": 1599, "system_time": 1778233511.524989}
+{"type": "attitude", "roll": 0.1, "pitch": 0.2, "yaw": 6, "system_time": 1778233511.925}
+{"type": "attitude", "roll": 0.1, "pitch": 0.2, "yaw": 6, "system_time": 1778233512.1282299}
+{"type": "attitude", "roll": 0.1, "pitch": 0.2, "yaw": 6, "system_time": 1778233512.432357}
+{"type": "attitude", "roll": 0.1, "pitch": 0.2, "yaw": 6, "system_time": 1778233512.635585}
+{"type": "attitude", "roll": 0.1, "pitch": 0.2, "yaw": 6, "system_time": 1778233512.734039}
+{"type": "attitude", "roll": 0.1, "pitch": 0.2, "yaw": 6, "system_time": 1778233513.536479}
+{"type": "attitude", "roll": 0.1, "pitch": 0.2, "yaw": 6, "system_time": 1778233513.740005}
+{"type": "rc", "roll": 1500, "pitch": 1500, "throttle": 1500, "yaw": 1599, "system_time": 1778233513.7527392}
+{"type": "attitude", "roll": 0.1, "pitch": 0.2, "yaw": 6, "system_time": 1778233514.144614}
+{"type": "rc", "roll": 1500, "pitch": 1500, "throttle": 1500, "yaw": 1599, "system_time": 1778233514.1563709}
+{"type": "attitude", "roll": 0.1, "pitch": 0.2, "yaw": 6, "system_time": 1778233514.649232}
+{"type": "rc", "roll": 1500, "pitch": 1500, "throttle": 1500, "yaw": 1599, "system_time": 1778233514.664551}
+{"type": "attitude", "roll": 0.1, "pitch": 0.2, "yaw": 6, "system_time": 1778233514.866943}
+{"type": "attitude", "roll": 0.1, "pitch": 0.2, "yaw": 6, "system_time": 1778233514.960912}
+{"type": "rc", "roll": 1500, "pitch": 1500, "throttle": 1500, "yaw": 1599, "system_time": 1778233514.973228}
+{"type": "attitude", "roll": 0.1, "pitch": 0.2, "yaw": 6, "system_time": 1778233515.4762912}
+{"type": "attitude", "roll": 0.1, "pitch": 0.2, "yaw": 6, "system_time": 1778233520.840768}
+{"type": "attitude", "roll": 0.1, "pitch": 0.2, "yaw": 6, "system_time": 1778233520.9511292}
+{"type": "attitude", "roll": 0.1, "pitch": 0.2, "yaw": 6, "system_time": 1778233521.2468228}
+{"type": "rc", "roll": 1500, "pitch": 1500, "throttle": 1500, "yaw": 1599, "system_time": 1778233521.259847}
+{"type": "analog", "vbat": 23.5, "current": 0.06, "system_time": 1778233521.470495}
+{"type": "attitude", "roll": 0.1, "pitch": 0.2, "yaw": 6, "system_time": 1778233522.4809222}
+{"type": "attitude", "roll": 0.1, "pitch": 0.2, "yaw": 7, "system_time": 1778233524.492574}
+{"type": "rc", "roll": 1500, "pitch": 1500, "throttle": 1500, "yaw": 1599, "system_time": 1778233524.5081751}
+{"type": "attitude", "roll": 0.1, "pitch": 0.2, "yaw": 7, "system_time": 1778233524.5986629}
+{"type": "attitude", "roll": 0.1, "pitch": 0.2, "yaw": 7, "system_time": 1778233524.700951}
+{"type": "attitude", "roll": 0.1, "pitch": 0.2, "yaw": 7, "system_time": 1778233524.8022258}
+{"type": "attitude", "roll": 0.1, "pitch": 0.2, "yaw": 7, "system_time": 1778233526.5219882}
+{"type": "attitude", "roll": 0.1, "pitch": 0.2, "yaw": 7, "system_time": 1778233526.827908}
+{"type": "attitude", "roll": 0.1, "pitch": 0.2, "yaw": 7, "system_time": 1778233526.936388}
+{"type": "attitude", "roll": 0.1, "pitch": 0.2, "yaw": 7, "system_time": 1778233527.229818}
+{"type": "rc", "roll": 1500, "pitch": 1500, "throttle": 1500, "yaw": 1599, "system_time": 1778233527.2415218}
+{"type": "attitude", "roll": 0.1, "pitch": 0.2, "yaw": 7, "system_time": 1778233527.4426339}
