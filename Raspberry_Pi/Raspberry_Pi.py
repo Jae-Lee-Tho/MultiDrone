@@ -66,7 +66,7 @@ class DroneController:
         # ---------------------------------------------------------------------
 
         # --- General Experiment Settings ---
-        self.mode = ExperimentMode.BOTH    # ✏️ TUNE: Switch between VOICE_ONLY, EEG_ONLY, BOTH, PHYSICAL_RC
+        self.mode = ExperimentMode.VOICE_ONLY   # ✏️ TUNE: Switch between VOICE_ONLY, EEG_ONLY, BOTH, PHYSICAL_RC
 
         # --- Drone Movement Dynamics ---
         self.action_duration = 1.0            # ✏️ TUNE: How long (seconds) a movement command (like FORWARD) lasts before auto-stopping
