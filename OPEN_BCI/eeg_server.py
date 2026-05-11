@@ -9,7 +9,8 @@ from pylsl import StreamInfo, StreamOutlet
 # =============================================================
 #  CONFIGURATION
 # =============================================================
-DATA_DIR      = "nakanishi_unfiltered_eeg/subject_8"
+# os.path.join ensures cross-platform compatibility for Windows (\) and Mac (/)
+DATA_DIR      = os.path.join("nakanishi_unfiltered_eeg", "subject_8")
 FS            = 256.0
 CHUNK_SAMPLES = int(2.0 * FS)  # 512 samples = 2 seconds
 
@@ -18,7 +19,9 @@ COMMAND_MAPPING = {
     't': '9.25hz.npy',   # TAKEOFF
     'q': '10.25hz.npy',  # STOP
     'l': '11.25hz.npy',  # LAND
+    'j': '12.25hz.npy',  # DOWN
     'd': '12.75hz.npy',  # RIGHT
+    'u': '13.25hz.npy',  # UP
     'w': '13.75hz.npy',  # FORWARD
     's': '14.25hz.npy',  # BACKWARD
     'a': '14.75hz.npy',  # LEFT
@@ -66,7 +69,7 @@ def load_random_snippet(key: str) -> list[list[float]]:
 SILENCE = [0.0] * 8  # flat zero sample — no signal, no noise
 
 # =============================================================
-#  KEYBOARD LISTENER (pynput — macOS-friendly, no sudo needed)
+#  KEYBOARD LISTENER (pynput — macOS & Windows friendly)
 # =============================================================
 pressed_keys: set[str] = set()
 should_exit = False
@@ -102,6 +105,8 @@ print("  Press keys to inject 2-second SSVEP bursts:\n")
 print("    [T]      →  TAKEOFF   (9.25 Hz)")
 print("    [Q]      →  STOP      (10.25 Hz)")
 print("    [L]      →  LAND      (11.25 Hz)")
+print("    [U]      →  UP        (13.25 Hz)")
+print("[J]      →  DOWN      (12.25 Hz)")
 print("    [W]      →  FORWARD   (13.75 Hz)")
 print("    [A]      →  LEFT      (14.75 Hz)")
 print("    [S]      →  BACKWARD  (14.25 Hz)")
@@ -109,7 +114,7 @@ print("    [D]      →  RIGHT     (12.75 Hz)\n")
 print("  [ESC]      →  Shut down server")
 print("-" * 60 + "\n")
 
-injection_buffer: list[list[float]] = []
+injection_buffer: list[list[float]] =[]
 next_sample_time = time.perf_counter()
 
 try:
