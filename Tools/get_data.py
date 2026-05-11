@@ -25,17 +25,15 @@ COMMAND_TO_KEY = {
     "RIGHT": "d", "FORWARD": "w", "BACKWARD": "s", "LEFT": "a"
 }
 
-# Network setup to talk to main_bci.py and server.py
 TELEMETRY_PORT = 4211
 telemetry_sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 telemetry_sock.bind(("0.0.0.0", TELEMETRY_PORT))
-telemetry_sock.settimeout(0.02)  # Fast non-blocking reads
+telemetry_sock.settimeout(0.02)
 
 SERVER_UDP_IP = "127.0.0.1"
 SERVER_UDP_PORT = 4213
 server_trigger_sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 
-# EEG Threshold matching main_bci.py
 CCA_CONFIDENCE_THRESHOLD = 0.65
 
 # =============================================================================
@@ -43,10 +41,8 @@ CCA_CONFIDENCE_THRESHOLD = 0.65
 # =============================================================================
 
 def load_completed_trials():
-    """Reads the CSV and returns a set of completed trial IDs to support resuming."""
     completed = set()
     if not os.path.exists(CSV_FILENAME):
-        # Create file and write headers clearly so Excel is easy to read
         with open(CSV_FILENAME, mode='w', newline='') as f:
             writer = csv.writer(f)
             writer.writerow([
@@ -63,7 +59,6 @@ def load_completed_trials():
     return completed
 
 def clear_telemetry_buffer():
-    """Flushes any old packets out of the socket before starting a new trial."""
     try:
         while True:
             telemetry_sock.recvfrom(4096)
@@ -84,7 +79,6 @@ def run_tests():
 
     for exp_type in EXPERIMENTS:
 
-        # Check if we have ANY remaining trials for this experiment block
         needs_run = False
         for cmd in COMMANDS:
             for i in range(1, N_TRIALS_PER_COMMAND + 1):
@@ -94,7 +88,7 @@ def run_tests():
             if needs_run: break
 
         if not needs_run:
-            continue # Skip to next experiment if this entire block is done
+            continue
 
         print("\n" + "#" * 60)
         print(f"  STARTING EXPERIMENT: {exp_type}")
@@ -107,12 +101,11 @@ def run_tests():
                 trial_id = f"{exp_type}_{target_cmd}_{trial_num}"
 
                 if trial_id in completed_trials:
-                    continue # Skip already done trials
+                    continue
 
                 print(f"\n--- [ {trial_id} ] ---")
 
-                # --- PREPARE TRIAL ---
-                if exp_type in["VOICE_ONLY", "BOTH"]:
+                if exp_type in ["VOICE_ONLY", "BOTH"]:
                     print(f"🗣️  Get ready to SAY: '{target_cmd}'")
                 if exp_type in ["EEG_ONLY", "BOTH"]:
                     print(f"🧠  System will auto-inject EEG for: '{target_cmd}'")
@@ -128,24 +121,17 @@ def run_tests():
                 clear_telemetry_buffer()
                 print(">>> GO! <<<")
 
-                start_time = time.time() # Used for Timeout and automated EEG trigger time
+                start_time = time.time()
 
-                # --- TRIGGER EEG AUTOMATICALLY ---
-                if exp_type in ["EEG_ONLY", "BOTH"]:
+                if exp_type in["EEG_ONLY", "BOTH"]:
                     key = COMMAND_TO_KEY[target_cmd]
                     server_trigger_sock.sendto(key.encode('utf-8'), (SERVER_UDP_IP, SERVER_UDP_PORT))
 
-                # --- TRACK METRICS DURING TIMEOUT WINDOW ---
                 voice_detected = "NA"
                 eeg_detected = "NA"
                 final_executed = "NA"
                 latency = "NA"
                 max_cca_score = 0.0
-
-                if exp_type == "EEG_ONLY":
-                    voice_detected = "NA"
-                elif exp_type == "VOICE_ONLY":
-                    eeg_detected = "NA"
 
                 # Polling Loop
                 while time.time() - start_time < TRIAL_TIMEOUT_SEC:
@@ -153,33 +139,31 @@ def run_tests():
                         data, _ = telemetry_sock.recvfrom(4096)
                         telem = json.loads(data.decode("utf-8"))
 
-                        # Track Max CCA Score observed during this trial
-                        current_score = telem.get("eeg_score", 0.0)
-                        if current_score > max_cca_score:
-                            max_cca_score = current_score
+                        # 💡 FIX: Strict State Masking!
+                        # Do not let EEG data populate during Voice trials, and vice versa.
+                        if exp_type in["EEG_ONLY", "BOTH"]:
+                            current_score = telem.get("eeg_score", 0.0)
+                            if current_score > max_cca_score:
+                                max_cca_score = current_score
 
-                        # Track Voice Recognition
-                        if telem.get("voice_cmd"):
-                            voice_detected = telem["voice_cmd"]
+                            if telem.get("eeg_cmd"):
+                                eeg_detected = telem["eeg_cmd"]
 
-                        # Track EEG Recognition
-                        if telem.get("eeg_cmd"):
-                            eeg_detected = telem["eeg_cmd"]
+                        if exp_type in ["VOICE_ONLY", "BOTH"]:
+                            if telem.get("voice_cmd"):
+                                voice_detected = telem["voice_cmd"]
 
-                        # Track Final Fusion Execution & LATENCY CALCULATION
+                        # Track Final Execution
                         if telem.get("final_cmd"):
                             final_executed = telem["final_cmd"]
 
-                            # Grab the precise audio-onset timestamp from main_bci.py
                             voice_onset = telem.get("voice_onset_time", 0.0)
 
-                            # Calculate Latency Based on Mode
                             if exp_type == "VOICE_ONLY" and voice_onset > 0.0:
                                 latency_val = time.time() - voice_onset
                             elif exp_type == "EEG_ONLY":
                                 latency_val = time.time() - start_time
                             elif exp_type == "BOTH":
-                                # For BOTH, latency starts from whichever signal fired FIRST.
                                 if voice_onset > 0.0:
                                     first_signal = min(start_time, voice_onset)
                                 else:
@@ -189,17 +173,15 @@ def run_tests():
                                 latency_val = time.time() - start_time
 
                             latency = round(latency_val, 3)
-                            break  # Success! End trial early.
+                            break
 
                     except socket.timeout:
-                        continue # No data this tick, keep waiting
+                        continue
                     except json.JSONDecodeError:
                         continue
 
-                # --- TRIAL FINISHED (Success or Timeout) ---
                 cca_accepted = max_cca_score >= CCA_CONFIDENCE_THRESHOLD
 
-                # Print a clean, labeled scorecard for this trial
                 print("\n" + "="*45)
                 print(f" 📊 TRIAL RESULTS: {trial_id}")
                 print("="*45)
@@ -230,7 +212,7 @@ def run_tests():
                     writer.writerow(row)
 
                 completed_trials.add(trial_id)
-                time.sleep(1.0) # Brief pause before next trial
+                time.sleep(1.0)
 
     print("\n🎉 ALL EXPERIMENTS COMPLETED SUCCESSFULLY! Data saved to", CSV_FILENAME)
 

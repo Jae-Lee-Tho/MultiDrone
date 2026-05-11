@@ -17,7 +17,6 @@ from vosk import Model, KaldiRecognizer
 from pylsl import resolve_byprop, StreamInlet
 from sklearn.cross_decomposition import CCA
 
-
 # =============================================================================
 # SECTION 1 — CONFIGURATION & MAPPING
 # =============================================================================
@@ -39,7 +38,6 @@ class Command(Enum):
     UP       = "UP"
     DOWN     = "DOWN"
 
-# ✏️ TUNE: FREQUENCY MAPPING (Nakanishi Dataset)
 FREQ_TO_COMMAND = {
      9.25: Command.TAKEOFF,
     10.25: Command.STOP,
@@ -56,32 +54,20 @@ class DroneState(Enum):
     GROUNDED = "GROUNDED"
     AIRBORNE = "AIRBORNE"
 
-
 # =============================================================================
 # SECTION 2 — DRONE CONTROLLER CLASS
 # =============================================================================
 
 class DroneController:
     def __init__(self):
-        # ---------------------------------------------------------------------
-        # 🛠️ TUNABLE PARAMETERS (Adjust these to change system behavior)
-        # ---------------------------------------------------------------------
-
-        # --- General Experiment Settings ---
         self.mode = ExperimentMode.VOICE_ONLY   # ✏️ TUNE: Switch between VOICE_ONLY, EEG_ONLY, BOTH, PHYSICAL_RC
 
-        # --- Drone Movement Dynamics ---
         self.action_duration = 1.0
         self.enable_smoothing = True
         self.smoothing_factor = 0.10
-
-        # --- Fusion Mode Timing ---
         self.command_expiry_seconds = 2.5
+        self.esp32_ip = "192.168.4.1"
 
-        # --- Network Settings ---
-        self.esp32_ip = "192.168.4.1"           # ✏️ TUNE/REQUIRED: Change this to the actual Wi-Fi IP address printed by your ESP32
-
-        # --- EEG/SSVEP Signal Processing ---
         self.window_seconds = 2.0
         self.window_step_fraction = 0.5
         self.confidence_threshold = 0.65
@@ -89,18 +75,13 @@ class DroneController:
         self.notch_freq_hz = 60.0
 
         # --- Latency & Voice Tracking ---
-        self.speech_onset_time = 0.0        # 소리가 감지되기 시작한 절대 시간
-        self.audio_threshold = 300          # ✏️ TUNE: 주변 소음에 맞춰 100~500 조절
-        self.last_voice_latency = 0.0       # Vosk가 단어를 인식하는 데 걸린 시간
-        self.pending_telemetry_cmd = None   # 드론 텔레메트리 피드백 대기용 명령
+        self.speech_onset_time = 0.0
+        self.audio_threshold = 300
+        self.last_voice_latency = 0.0
+        self.pending_telemetry_cmd = None
 
-        # Filters
         self.bandpass_low_hz = 7.0
         self.bandpass_high_hz = 18.0
-
-        # ---------------------------------------------------------------------
-        # ⚙️ INTERNAL STATE & CONSTANTS (Leave these alone)
-        # ---------------------------------------------------------------------
 
         self.esp32_port = 4210
         self.udp_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -210,16 +191,13 @@ class DroneController:
         return None
 
     def audio_callback(self, indata, _frames, _time_info, _status):
-        # 1. 원시 바이트 데이터를 16비트 숫자(정수) 배열로 변환
         audio_data = np.frombuffer(indata, dtype=np.int16)
-
-        # 2. 물리적 소리 감지 (Speech Onset)
         peak_volume = np.max(np.abs(audio_data))
 
+        # Only set onset if it's currently 0.0 so we capture the true START of speech
         if peak_volume > self.audio_threshold and self.speech_onset_time == 0.0:
             self.speech_onset_time = time.time()
 
-        # 3. Vosk 음성 인식 처리
         if self.recognizer.AcceptWaveform(bytes(indata)):
             result = json.loads(self.recognizer.Result())
             text = result.get("text", "").strip()
@@ -227,18 +205,16 @@ class DroneController:
             if text:
                 cmd = self._map_speech_to_command(text)
                 if cmd:
-                    # 💡 첫 번째 레이턴시 측정: 인식 완료 시간
                     self.last_voice_latency = time.time() - self.speech_onset_time
                     print(f"[VOICE] Heard: '{text}' → {cmd.value} (Peak Vol: {peak_volume}, Latency: {self.last_voice_latency:.3f}s)")
 
                     self.active_voice_cmd = cmd
                     self.active_voice_time = self.speech_onset_time
                 else:
-                    # 말을 했으나 명령어가 아닐 경우 타이머 초기화
+                    # Heard words but not a valid command. Reset so it doesn't get stuck.
                     self.speech_onset_time = 0.0
-            else:
-                # 소음이었을 경우 타이머 초기화
-                self.speech_onset_time = 0.0
+
+            # NOTE: We removed the "else: reset" from here. It was resetting while you were mid-sentence!
 
     # =========================================================================
     # CORE: EEG PROCESSING
@@ -421,12 +397,19 @@ class DroneController:
                     # 1. Expire stale commands & safely reset timers
                     if now - self.active_voice_time > self.command_expiry_seconds:
                         self.active_voice_cmd = None
-                        self.speech_onset_time = 0.0 # Reset so it doesn't get stuck
 
                     if now - self.active_eeg_time > self.command_expiry_seconds:
                         self.active_eeg_cmd = None
 
+                    # Prevent the onset timer from getting "stuck" if you cough or bump the mic
+                    if self.speech_onset_time > 0.0 and (now - self.speech_onset_time > 4.0):
+                        self.speech_onset_time = 0.0
+
                     final_cmd = None
+
+                    # 💡 FIX: Take a snapshot of the commands BEFORE they are cleared for Telemetry
+                    snap_voice = self.active_voice_cmd.value if self.active_voice_cmd else None
+                    snap_eeg = self.active_eeg_cmd.value if self.active_eeg_cmd else None
 
                     # 2. Logic & Fusion rules
                     if self.active_voice_cmd is Command.STOP or self.active_eeg_cmd is Command.STOP:
@@ -485,13 +468,13 @@ class DroneController:
                         )
                         self.udp_socket.sendto(esp32_payload.encode("utf-8"), (self.esp32_ip, self.esp32_port))
 
-                    # 7. Test Runner Telemetry (Now includes voice_onset_time!)
+                    # 7. Test Runner Telemetry
                     runner_payload = {
                         "state": self.drone_state.value,
-                        "voice_cmd": self.active_voice_cmd.value if self.active_voice_cmd else None,
-                        "eeg_cmd": self.active_eeg_cmd.value if self.active_eeg_cmd else None,
+                        "voice_cmd": snap_voice,        # 💡 FIX: Uses the snapshot! No more NA!
+                        "eeg_cmd": snap_eeg,            # 💡 FIX: Uses the snapshot! No more NA!
                         "final_cmd": final_cmd.value if final_cmd else None,
-                        "voice_onset_time": self.speech_onset_time,  # CRITICAL FOR TEST RUNNER
+                        "voice_onset_time": self.speech_onset_time,
                         "is_moving": self.is_moving,
                         "eeg_score": self.latest_eeg_score,
                         "rc_channels": self.rc_channels,
@@ -499,13 +482,12 @@ class DroneController:
                     }
                     self.test_runner_socket.sendto(json.dumps(runner_payload).encode("utf-8"), (self.test_runner_ip, self.test_runner_port))
 
-                    # 8. 💡 두 번째 레이턴시 측정: 드론 텔레메트리 피드백 확인 (Terminal Printout only)
+                    # 8. Drone Telemetry Feedback
                     if self.pending_telemetry_cmd and self.speech_onset_time > 0.0:
                         pitch_ok = abs(self.latest_telemetry["rc_pitch"] - self.target_rc_channels["pitch"]) < 50
                         roll_ok = abs(self.latest_telemetry["rc_roll"] - self.target_rc_channels["roll"]) < 50
                         thr_ok = abs(self.latest_telemetry["rc_throttle"] - self.target_rc_channels["throttle"]) < 50
 
-                        # 파이썬이 요구한 값으로 드론의 RC 값이 도달했다면 (FC가 명령을 완벽히 수신했다면)
                         if pitch_ok and roll_ok and thr_ok:
                             drone_latency = time.time() - self.speech_onset_time
 
@@ -515,7 +497,6 @@ class DroneController:
                             print(f"   - Drone Exec Time:  {drone_latency:.3f} s")
                             print("-" * 50)
 
-                            # 기록 완료 후 대기열 및 타이머 초기화 (다음 명령 대기)
                             self.pending_telemetry_cmd = None
                             self.speech_onset_time = 0.0
 
@@ -532,7 +513,6 @@ class DroneController:
                 f"{self.rc_channels['arm']}"
             )
             self.udp_socket.sendto(payload.encode("utf-8"), (self.esp32_ip, self.esp32_port))
-
 
 if __name__ == "__main__":
     controller = DroneController()
