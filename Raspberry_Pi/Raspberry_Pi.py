@@ -9,6 +9,7 @@ import threading
 import json
 import datetime
 import numpy as np
+import csv
 from enum import Enum
 
 import sounddevice as sd
@@ -36,19 +37,13 @@ class Command(Enum):
     LEFT     = "LEFT"
     RIGHT    = "RIGHT"
     STOP     = "STOP"
-    UP       = "UP"
-    DOWN     = "DOWN"
 
 # ✏️ TUNE: FREQUENCY MAPPING (Nakanishi Dataset)
-# If you decide to change which frequency triggers which command in the future,
-# simply swap the Command.NAME values here.
 FREQ_TO_COMMAND = {
      9.25: Command.TAKEOFF,
     10.25: Command.STOP,
     11.25: Command.LAND,
-    12.25: Command.DOWN,
     12.75: Command.RIGHT,
-    13.25: Command.UP,
     13.75: Command.FORWARD,
     14.25: Command.BACKWARD,
     14.75: Command.LEFT,
@@ -69,39 +64,43 @@ class DroneController:
         # 🛠️ TUNABLE PARAMETERS (Adjust these to change system behavior)
         # ---------------------------------------------------------------------
 
+        # --- CSV Data Logging ---
+        self.csv_filename = f"'/Users/jaelee/Desktop/Drone_Trial - Sheet1.csv'
+        with open(self.csv_filename, mode='w', newline='') as file:
+            writer = csv.writer(file)
+            writer.writerow(["Time", "Mode", "Voice_Pred", "CCA_Score", "EEG_Cmd", "Final_Cmd", "Voice_Recog_Time_s", "Drone_Recog_Time_s"])
+
         # --- General Experiment Settings ---
         self.mode = ExperimentMode.VOICE_ONLY   # ✏️ TUNE: Switch between VOICE_ONLY, EEG_ONLY, BOTH, PHYSICAL_RC
 
         # --- Drone Movement Dynamics ---
-        self.action_duration = 1.0            # ✏️ TUNE: How long (seconds) a movement command (like FORWARD) lasts before auto-stopping
-        self.enable_smoothing = True          # ✏️ TUNE: True = smooth cinematic movements, False = instant jerky movements
-        self.smoothing_factor = 0.10          # ✏️ TUNE: 0.01 (very slow ramp up) to 1.0 (instant). Only used if smoothing is True.
-
-        # --- Movement Magnitudes (RC Channel Targets) ---
-        self.hover_throttle = 1600.0          # ✏️ TUNE: Base throttle to maintain altitude. 1000 = Off, 2000 = Max.
-        self.up_throttle = 1700.0             # ✏️ TUNE: Throttle for UP command
-        self.down_throttle = 1500.0           # ✏️ TUNE: Throttle for DOWN command
-        self.forward_pitch = 1600.0           # ✏️ TUNE: Pitch for FORWARD command (1500 is neutral)
-        self.backward_pitch = 1400.0          # ✏️ TUNE: Pitch for BACKWARD command
-        self.right_roll = 1600.0              # ✏️ TUNE: Roll for RIGHT command (1500 is neutral)
-        self.left_roll = 1400.0               # ✏️ TUNE: Roll for LEFT command
+        self.action_duration = 1.0            
+        self.enable_smoothing = True          
+        self.smoothing_factor = 0.10          
 
         # --- Fusion Mode Timing ---
-        self.command_expiry_seconds = 2.5     # ✏️ TUNE: Max time (seconds) to wait for Voice and EEG to match. If Voice is heard, how long to wait for EEG?
+        self.command_expiry_seconds = 2.5     
 
         # --- Network Settings ---
         self.esp32_ip = "192.168.4.1"           # ✏️ TUNE/REQUIRED: Change this to the actual Wi-Fi IP address printed by your ESP32
 
         # --- EEG/SSVEP Signal Processing ---
-        self.window_seconds = 2.0             # ✏️ TUNE: Length of EEG data fed to CCA. Larger = more accurate but slower to react (2.0s to 3.0s is ideal)
-        self.window_step_fraction = 0.5       # ✏️ TUNE: How much the window slides forward. 0.5 means a 2.0s window updates every 1.0s. Lower = faster updates, higher CPU.
-        self.confidence_threshold = 0.65      # ✏️ TUNE: Minimum CCA score (0.0 to 1.0) to trigger a command. Lower = more false positives. Higher = harder to trigger.
-        self.num_harmonics = 3                # ✏️ TUNE: Number of harmonics for CCA reference signals. 2 or 3 is standard.
-        self.notch_freq_hz = 60.0             # ✏️ TUNE: Powerline noise frequency. 60.0 for Americas/Japan. 50.0 for Europe/Asia.
+        self.window_seconds = 2.0             
+        self.window_step_fraction = 0.5       
+        self.confidence_threshold = 0.65      
+        self.num_harmonics = 3                
+        self.notch_freq_hz = 60.0             
 
-        # Filters (Only change these if you start using frequencies outside the 9-15Hz range)
-        self.bandpass_low_hz = 7.0            # ✏️ TUNE: Lower cutoff for EEG bandpass filter
-        self.bandpass_high_hz = 18.0          # ✏️ TUNE: Upper cutoff for EEG bandpass filter
+        # --- Latency & Voice Tracking ---
+        self.speech_onset_time = 0.0        # 소리가 감지되기 시작한 절대 시간
+        self.audio_threshold = 300          # ✏️ TUNE: 주변 소음에 맞춰 100~500 조절
+        self.last_voice_latency = 0.0       # Vosk가 단어를 인식하는 데 걸린 시간
+        self.pending_telemetry_cmd = None   # 드론 텔레메트리 피드백 대기용 명령
+        self.pending_csv_data = None        # 텔레메트리 도착 시 기록할 임시 데이터
+
+        # Filters 
+        self.bandpass_low_hz = 7.0            
+        self.bandpass_high_hz = 18.0          
 
 
         # ---------------------------------------------------------------------
@@ -133,7 +132,7 @@ class DroneController:
         self.latest_eeg_score = 0.0
 
         self.latest_telemetry = {
-            "vbat": 0.0, "current": 0.0, "roll": 0.0, "pitch": 0.0, "yaw": 0.0,
+            "vbat": 0.0, "current": 0.0, "roll": 0.0, "pitch": 0.0, "yaw": 0.0, "alt": 0.0,
             "rc_roll": 1500, "rc_pitch": 1500, "rc_yaw": 1500, "rc_throttle": 1000
         }
         self.rc_channels = {
@@ -182,6 +181,8 @@ class DroneController:
                     self.latest_telemetry["roll"] = telemetry_data.get("roll", 0.0)
                     self.latest_telemetry["pitch"] = telemetry_data.get("pitch", 0.0)
                     self.latest_telemetry["yaw"] = telemetry_data.get("yaw", 0.0)
+                elif t_type == "altitude":
+                    self.latest_telemetry["alt"] = telemetry_data.get("alt", 0.0)
                 elif t_type == "rc":
                     self.latest_telemetry["rc_roll"] = telemetry_data.get("roll", 1500)
                     self.latest_telemetry["rc_pitch"] = telemetry_data.get("pitch", 1500)
@@ -210,20 +211,35 @@ class DroneController:
         if "left" in text:     return Command.LEFT
         if "right" in text:    return Command.RIGHT
         if "stop" in text:     return Command.STOP
-        if "up" in text:       return Command.UP
-        if "down" in text:     return Command.DOWN
         return None
 
     def audio_callback(self, indata, _frames, _time_info, _status):
+        # 1. 원시 바이트 데이터를 16비트 숫자(정수) 배열로 변환
+        audio_data = np.frombuffer(indata, dtype=np.int16)
+        
+        # 2. 물리적 소리 감지 (Speech Onset)
+        peak_volume = np.max(np.abs(audio_data))
+        
+        if peak_volume > self.audio_threshold and self.speech_onset_time == 0.0:
+            self.speech_onset_time = time.time()
+            
+        # 3. Vosk 음성 인식 처리 
         if self.recognizer.AcceptWaveform(bytes(indata)):
             result = json.loads(self.recognizer.Result())
-            text = result.get("text", "").strip()
+            text = result.get("text", "").strip()        
+            
             if text:
                 cmd = self._map_speech_to_command(text)
                 if cmd:
-                    print(f"[VOICE] Heard: '{text}' → {cmd.value}")
+                    # 💡 첫 번째 레이턴시 측정: 인식 완료 시간
+                    self.last_voice_latency = time.time() - self.speech_onset_time
+                    
+                    print(f"[VOICE] Heard: '{text}' → {cmd.value} (Peak Vol: {peak_volume}, Latency: {self.last_voice_latency:.3f}s)")
+                    
                     self.active_voice_cmd = cmd
-                    self.active_voice_time = time.time()
+                    self.active_voice_time = self.speech_onset_time
+            
+            # 텔레메트리 검증이 끝날 때까지 0으로 초기화하지 않고 보존합니다. (run 루프에서 초기화 처리)
 
     # =========================================================================
     # CORE: EEG PROCESSING
@@ -240,7 +256,6 @@ class DroneController:
         cleaned = detrend(eeg_data, axis=0)
         cleaned = sosfiltfilt(notch_sos, cleaned, axis=0)
         cleaned = sosfiltfilt(bandpass_sos, cleaned, axis=0)
-        # Common Average Reference (CAR)
         cleaned = cleaned - cleaned.mean(axis=1, keepdims=True)
         return cleaned
 
@@ -256,22 +271,16 @@ class DroneController:
         samples = eeg_data.shape[0]
         best_freq, best_score = None, 0.0
 
-        # --- SAFETY CHECK: Prevent CCA from crashing on flatline data ---
-        # If the data is completely flat (variance near zero), CCA will divide by zero
-        # and throw a NaN ValueError. This happens when server.py sends idle 0.0s.
         if np.allclose(eeg_data, 0.0, atol=1e-8) or np.var(eeg_data) < 1e-8:
             self.latest_eeg_score = 0.0
             return None, 0.0
-        # ----------------------------------------------------------------
 
         for freq in FREQ_TO_COMMAND:
             y_ref = self._generate_reference_signals(samples, sample_rate, freq)
-
             cca = CCA(n_components=1)
             cca.fit(eeg_data, y_ref)
             X_c, Y_c = cca.transform(eeg_data, y_ref)
 
-            # Catch correlation of flat signals that somehow slipped through
             with np.errstate(divide='ignore', invalid='ignore'):
                 score = float(np.corrcoef(X_c[:, 0], Y_c[:, 0])[0, 1])
 
@@ -317,7 +326,6 @@ class DroneController:
                 data_buffer = data_buffer[-window_samples:]
                 eeg_window = np.array(data_buffer, dtype=np.float64)
 
-                # Process
                 eeg_clean = self._preprocess_eeg(eeg_window, bandpass_sos, notch_sos)
                 best_freq, score = self.analyze_ssvep_window(eeg_clean, srate)
 
@@ -326,16 +334,12 @@ class DroneController:
                     print(f"[EEG] Detected: {best_freq:>5.2f} Hz  (Score: {score:.3f})  →  {cmd.value}")
                     self.active_eeg_cmd = cmd
                     self.active_eeg_time = time.time()
+                    
+                    if self.speech_onset_time == 0.0:
+                        self.speech_onset_time = time.time() - self.window_seconds
 
-                    # -----------------------------------------------------------------
-                    # FIX: Flush the buffer entirely!
-                    # Instead of stepping forward by half a window, we clear it out.
-                    # This creates an automatic 2.0-second "cooldown" where the system
-                    # is forced to wait for fresh, new brainwaves before triggering again.
-                    # -----------------------------------------------------------------
                     data_buffer =[]
                 else:
-                    # Only slide the window by the step fraction if NOTHING was detected
                     data_buffer = data_buffer[step_samples:]
 
             time.sleep(0.01)
@@ -358,10 +362,12 @@ class DroneController:
 
     def apply_command(self, command: Command):
         vbat = self.latest_telemetry["vbat"]
+        alt = self.latest_telemetry.get("alt", 0.0)
         vbat_str = f"[{vbat:.1f}V]" if vbat > 0 else "[No VBat]"
+        alt_str = f"[{alt:.2f}m]"
 
         if command is Command.STOP:
-            print(f"\n{vbat_str}[EMERGENCY STOP] Disarming immediately.")
+            print(f"\n{vbat_str} {alt_str} [EMERGENCY STOP] Disarming immediately.")
             self._disarm()
             self.is_moving = False
             self.drone_state = DroneState.GROUNDED
@@ -369,32 +375,28 @@ class DroneController:
 
         if self.drone_state is DroneState.GROUNDED:
             if command is not Command.TAKEOFF:
-                print(f"{vbat_str}[BLOCKED] Grounded. Takeoff first. (Ignored: {command.value})")
+                print(f"{vbat_str} {alt_str} [BLOCKED] Grounded. Takeoff first. (Ignored: {command.value})")
                 return
-            print(f"\n{vbat_str}[TAKEOFF] Arming and spooling up motors.")
+            print(f"\n{vbat_str} {alt_str} [TAKEOFF] Arming and spooling up motors.")
             self.rc_channels["arm"] = 2000
-            self.target_rc_channels["throttle"] = self.hover_throttle
-
+            self.target_rc_channels["throttle"] = 1600.0
             self.drone_state = DroneState.AIRBORNE
 
         elif self.drone_state is DroneState.AIRBORNE:
             if command is Command.TAKEOFF: return
             if command is Command.LAND:
-                print(f"\n{vbat_str} [LAND] Disarming and landing.")
+                print(f"\n{vbat_str} {alt_str} [LAND] Disarming and landing.")
                 self._disarm()
                 self.is_moving = False
                 self.drone_state = DroneState.GROUNDED
                 return
 
-            print(f"{vbat_str} [MOVE] {command.value}")
+            print(f"{vbat_str} {alt_str} [MOVE] {command.value}")
 
-            # Apply movement channels using user-defined magnitudes
-            if command is Command.FORWARD:  self.target_rc_channels["pitch"] = self.forward_pitch
-            if command is Command.BACKWARD: self.target_rc_channels["pitch"] = self.backward_pitch
-            if command is Command.LEFT:     self.target_rc_channels["roll"]  = self.left_roll
-            if command is Command.RIGHT:    self.target_rc_channels["roll"]  = self.right_roll
-            if command is Command.UP:       self.target_rc_channels["throttle"] = self.up_throttle
-            if command is Command.DOWN:     self.target_rc_channels["throttle"] = self.down_throttle
+            if command is Command.FORWARD:  self.target_rc_channels["pitch"] = 1600.0
+            if command is Command.BACKWARD: self.target_rc_channels["pitch"] = 1400.0
+            if command is Command.LEFT:     self.target_rc_channels["roll"]  = 1400.0
+            if command is Command.RIGHT:    self.target_rc_channels["roll"]  = 1600.0
 
             self.last_movement_time = time.time()
             self.is_moving = True
@@ -409,7 +411,6 @@ class DroneController:
         print(f"  Target ESP32: {self.esp32_ip}:{self.esp32_port}")
         print("=" * 60)
 
-        # Start Threads
         threading.Thread(target=self.eeg_polling_thread, daemon=True).start()
         threading.Thread(target=self.telemetry_listener_thread, daemon=True).start()
 
@@ -448,17 +449,30 @@ class DroneController:
                                 final_cmd = self.active_voice_cmd
                             else:
                                 print(f"[FUSION] Disagree (Voice: {self.active_voice_cmd.value} vs EEG: {self.active_eeg_cmd.value}) → Ignored.")
+                            
                             self.active_voice_cmd = self.active_eeg_cmd = None
 
-                    # 3. Execution
+                    # 3. Execution & Data Staging
                     if final_cmd:
                         self.apply_command(final_cmd)
+                        
+                        # 명령 전송과 동시에 대기열(Queue)에 데이터를 올립니다.
+                        self.pending_telemetry_cmd = final_cmd
+                        
+                        # 엑셀 기록을 위한 임시 배열
+                        self.pending_csv_data = [
+                            datetime.datetime.now().strftime('%H:%M:%S.%f')[:-3],
+                            self.mode.value,
+                            self.active_voice_cmd.value if self.active_voice_cmd else "NONE",
+                            f"{self.latest_eeg_score:.4f}",
+                            self.active_eeg_cmd.value if self.active_eeg_cmd else "NONE",
+                            final_cmd.value
+                        ]
 
                     # 4. Auto-Stop Movement
                     if self.is_moving and (now - self.last_movement_time > self.action_duration):
                         print("[AUTO-STOP] Returning to neutral hover.")
                         self._set_neutral_movement()
-                        self.target_rc_channels["throttle"] = self.hover_throttle  # Return throttle to neutral hover baseline
                         self.is_moving = False
 
                     # 5. Interpolation (Smoothing)
@@ -470,7 +484,6 @@ class DroneController:
                             self.rc_channels[axis] = self.target_rc_channels[axis]
 
                     # 6. UDP Transmission to ESP32
-                    # FORMAT FIX: Roll, Pitch, Yaw, Throttle, Arm (Matches MSP Standard)
                     if self.mode is not ExperimentMode.PHYSICAL_RC:
                         esp32_payload = (
                             f"{int(self.rc_channels['roll'])},"
@@ -494,6 +507,34 @@ class DroneController:
                     }
                     self.test_runner_socket.sendto(json.dumps(runner_payload).encode("utf-8"), (self.test_runner_ip, self.test_runner_port))
 
+                    # 8. 💡 두 번째 레이턴시 측정: 드론 텔레메트리 피드백 확인 (End-to-End Latency)
+                    if self.pending_telemetry_cmd and self.speech_onset_time > 0.0:
+                        pitch_ok = abs(self.latest_telemetry["rc_pitch"] - self.target_rc_channels["pitch"]) < 50
+                        roll_ok = abs(self.latest_telemetry["rc_roll"] - self.target_rc_channels["roll"]) < 50
+                        thr_ok = abs(self.latest_telemetry["rc_throttle"] - self.target_rc_channels["throttle"]) < 50
+                        
+                        # 파이썬이 요구한 값으로 드론의 RC 값이 도달했다면 (FC가 명령을 완벽히 수신했다면)
+                        if pitch_ok and roll_ok and thr_ok:
+                            drone_latency = time.time() - self.speech_onset_time
+                            
+                            print("-" * 50)
+                            print(f"📊 [LATENCY REPORT] Target Command: {self.pending_telemetry_cmd.value}")
+                            print(f"   - Voice Recog Time: {self.last_voice_latency:.3f} s")
+                            print(f"   - Drone Recog Time: {drone_latency:.3f} s")
+                            print("-" * 50)
+                            
+                            # 최종 레이턴시 수치 2개를 포함하여 CSV에 한 줄 작성
+                            if self.pending_csv_data:
+                                with open(self.csv_filename, mode='a', newline='') as file:
+                                    writer = csv.writer(file)
+                                    row = self.pending_csv_data + [f"{self.last_voice_latency:.3f}", f"{drone_latency:.3f}"]
+                                    writer.writerow(row)
+                                
+                            # 기록 완료 후 대기열 및 타이머 초기화 (다음 명령 대기)
+                            self.pending_telemetry_cmd = None
+                            self.pending_csv_data = None
+                            self.speech_onset_time = 0.0
+
                     time.sleep(0.02) # 50Hz Loop
 
         except KeyboardInterrupt:
@@ -508,10 +549,6 @@ class DroneController:
             )
             self.udp_socket.sendto(payload.encode("utf-8"), (self.esp32_ip, self.esp32_port))
 
-
-# =============================================================================
-# ENTRY POINT
-# =============================================================================
 
 if __name__ == "__main__":
     controller = DroneController()

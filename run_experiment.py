@@ -11,7 +11,8 @@ Type 'quit' at any command prompt to end the session.
 """
 
 import time
-
+import socket
+import json
 from experiment_logger import ExperimentLogger
 from betaflight_msp import BetaflightMSP
 

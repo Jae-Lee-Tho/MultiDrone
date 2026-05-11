@@ -1,0 +1,534 @@
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475090.5543659}
+{"type": "rc", "roll": 1401, "pitch": 1401, "throttle": 1401, "yaw": 885, "system_time": 1778475090.5594518}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475090.559547}
+{"type": "rc", "roll": 1401, "pitch": 1401, "throttle": 1401, "yaw": 885, "system_time": 1778475090.559603}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475090.5596511}
+{"type": "rc", "roll": 1401, "pitch": 1401, "throttle": 1401, "yaw": 885, "system_time": 1778475090.559695}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475090.60115}
+{"type": "rc", "roll": 1401, "pitch": 1401, "throttle": 1401, "yaw": 885, "system_time": 1778475090.614251}
+{"type": "analog", "vbat": 23.1, "current": 0.0, "system_time": 1778475090.684188}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475090.824342}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475091.125866}
+{"type": "rc", "roll": 1500, "pitch": 1500, "throttle": 1500, "yaw": 1000, "system_time": 1778475091.141802}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475091.345622}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475091.63344}
+{"type": "rc", "roll": 1500, "pitch": 1500, "throttle": 1500, "yaw": 1000, "system_time": 1778475091.645962}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475093.1582432}
+{"type": "rc", "roll": 1500, "pitch": 1500, "throttle": 1500, "yaw": 1000, "system_time": 1778475093.171975}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475094.274642}
+{"type": "rc", "roll": 1500, "pitch": 1500, "throttle": 1500, "yaw": 1000, "system_time": 1778475094.284561}
+{"type": "analog", "vbat": 23.1, "current": 0.0, "system_time": 1778475094.698271}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475094.8979788}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475095.092171}
+{"type": "rc", "roll": 1500, "pitch": 1500, "throttle": 1500, "yaw": 1000, "system_time": 1778475095.10272}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475095.188638}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475095.303669}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475096.2090461}
+{"type": "analog", "vbat": 23.1, "current": 0.0, "system_time": 1778475096.2164202}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475098.4346728}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475098.537175}
+{"type": "rc", "roll": 1500, "pitch": 1500, "throttle": 1500, "yaw": 1599, "system_time": 1778475098.552269}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475099.1479208}
+{"type": "rc", "roll": 1500, "pitch": 1500, "throttle": 1500, "yaw": 1599, "system_time": 1778475099.163904}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475099.656081}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475099.868883}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475100.172392}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475100.376298}
+{"type": "analog", "vbat": 23.1, "current": 0.0, "system_time": 1778475100.728981}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475101.590988}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475101.795056}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475102.096809}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475102.401567}
+{"type": "rc", "roll": 1500, "pitch": 1500, "throttle": 1500, "yaw": 1599, "system_time": 1778475102.413652}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475102.591885}
+{"type": "rc", "roll": 1500, "pitch": 1500, "throttle": 1500, "yaw": 1599, "system_time": 1778475102.616283}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475102.793205}
+{"type": "rc", "roll": 1500, "pitch": 1500, "throttle": 1500, "yaw": 1599, "system_time": 1778475102.819989}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475102.906268}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475103.1090372}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475103.311594}
+{"type": "rc", "roll": 1500, "pitch": 1500, "throttle": 1500, "yaw": 1599, "system_time": 1778475103.3240068}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475103.410041}
+{"type": "rc", "roll": 1500, "pitch": 1500, "throttle": 1500, "yaw": 1599, "system_time": 1778475103.4255528}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475104.1289659}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475104.331712}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475104.636534}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475105.031088}
+{"type": "rc", "roll": 1500, "pitch": 1500, "throttle": 1500, "yaw": 1599, "system_time": 1778475105.0435991}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475105.131061}
+{"type": "rc", "roll": 1500, "pitch": 1500, "throttle": 1500, "yaw": 1599, "system_time": 1778475105.145211}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475106.570442}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475107.065403}
+{"type": "rc", "roll": 1472, "pitch": 1500, "throttle": 1500, "yaw": 1599, "system_time": 1778475107.0784729}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475107.176146}
+{"type": "analog", "vbat": 23.1, "current": 0.0, "system_time": 1778475107.25725}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475108.28226}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475108.499277}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475108.5894458}
+{"type": "rc", "roll": 1499, "pitch": 1500, "throttle": 1500, "yaw": 1599, "system_time": 1778475108.602591}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475108.800981}
+{"type": "analog", "vbat": 23.1, "current": 0.06, "system_time": 1778475109.25708}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475109.39906}
+{"type": "rc", "roll": 1499, "pitch": 1500, "throttle": 1500, "yaw": 1599, "system_time": 1778475109.4120908}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475109.808363}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475110.42148}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475111.130618}
+{"type": "rc", "roll": 1499, "pitch": 1500, "throttle": 1500, "yaw": 1599, "system_time": 1778475111.143643}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475111.3207948}
+{"type": "rc", "roll": 1499, "pitch": 1500, "throttle": 1500, "yaw": 1599, "system_time": 1778475111.335456}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475112.050901}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475112.3547142}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475112.555987}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475112.650034}
+{"type": "rc", "roll": 1525, "pitch": 1500, "throttle": 1500, "yaw": 1599, "system_time": 1778475112.661786}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475112.757824}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475113.56921}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475113.679924}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475113.770504}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475113.886967}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475114.0648692}
+{"type": "rc", "roll": 1500, "pitch": 1500, "throttle": 1500, "yaw": 1599, "system_time": 1778475114.0827498}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475114.3937159}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475114.598688}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475115.202324}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475115.297499}
+{"type": "rc", "roll": 1500, "pitch": 1500, "throttle": 1500, "yaw": 1599, "system_time": 1778475115.310842}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475115.397782}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475119.04609}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475119.359547}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475119.555634}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475123.088825}
+{"type": "rc", "roll": 1472, "pitch": 1500, "throttle": 1500, "yaw": 1599, "system_time": 1778475123.108305}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475123.603168}
+{"type": "rc", "roll": 1496, "pitch": 1500, "throttle": 1500, "yaw": 1599, "system_time": 1778475123.619227}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475124.6145122}
+{"type": "rc", "roll": 1597, "pitch": 1500, "throttle": 1500, "yaw": 1599, "system_time": 1778475124.628169}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475124.816024}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475125.031199}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475125.121708}
+{"type": "rc", "roll": 1518, "pitch": 1500, "throttle": 1500, "yaw": 1599, "system_time": 1778475125.134751}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475125.234139}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475125.332644}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475125.4241788}
+{"type": "rc", "roll": 1505, "pitch": 1500, "throttle": 1500, "yaw": 1599, "system_time": 1778475125.437273}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475125.940974}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475126.337473}
+{"type": "rc", "roll": 1500, "pitch": 1500, "throttle": 1500, "yaw": 1599, "system_time": 1778475126.3510962}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475126.4383302}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475126.5494149}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475126.6521149}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475126.8439848}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475127.0468822}
+{"type": "rc", "roll": 1500, "pitch": 1500, "throttle": 1500, "yaw": 1599, "system_time": 1778475127.068311}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475127.147319}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475127.358894}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475127.861015}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475128.364116}
+{"type": "rc", "roll": 1500, "pitch": 1500, "throttle": 1500, "yaw": 1599, "system_time": 1778475128.3776581}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475128.577674}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475129.386226}
+{"type": "rc", "roll": 1500, "pitch": 1500, "throttle": 1500, "yaw": 1000, "system_time": 1778475129.396857}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475129.49576}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475131.3056798}
+{"type": "rc", "roll": 1500, "pitch": 1500, "throttle": 1500, "yaw": 1000, "system_time": 1778475131.319364}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475132.32411}
+{"type": "rc", "roll": 1500, "pitch": 1500, "throttle": 1500, "yaw": 1000, "system_time": 1778475132.33645}
+{"type": "analog", "vbat": 23.1, "current": 0.06, "system_time": 1778475132.852478}
+{"type": "analog", "vbat": 23.1, "current": 0.06, "system_time": 1778475133.849399}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475134.860242}
+{"type": "rc", "roll": 1500, "pitch": 1500, "throttle": 1500, "yaw": 1000, "system_time": 1778475134.8726258}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475134.960948}
+{"type": "rc", "roll": 1500, "pitch": 1500, "throttle": 1500, "yaw": 1000, "system_time": 1778475134.9736562}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475135.075752}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475136.18191}
+{"type": "rc", "roll": 1500, "pitch": 1500, "throttle": 1500, "yaw": 1000, "system_time": 1778475136.196924}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475136.296577}
+{"type": "analog", "vbat": 23.1, "current": 0.0, "system_time": 1778475136.355145}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475136.3968651}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475136.589366}
+{"type": "rc", "roll": 1500, "pitch": 1500, "throttle": 1500, "yaw": 1000, "system_time": 1778475136.610858}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475137.3101828}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475137.406983}
+{"type": "rc", "roll": 1500, "pitch": 1500, "throttle": 1500, "yaw": 1000, "system_time": 1778475137.4189792}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475137.506943}
+{"type": "rc", "roll": 1500, "pitch": 1500, "throttle": 1500, "yaw": 1000, "system_time": 1778475137.5200691}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475139.946212}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475140.0478342}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475140.949518}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475141.85895}
+{"type": "rc", "roll": 1500, "pitch": 1500, "throttle": 1500, "yaw": 1000, "system_time": 1778475141.8738072}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475142.066354}
+{"type": "rc", "roll": 1500, "pitch": 1500, "throttle": 1500, "yaw": 1000, "system_time": 1778475142.082192}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475142.164213}
+{"type": "rc", "roll": 1500, "pitch": 1500, "throttle": 1500, "yaw": 1000, "system_time": 1778475142.1770911}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475145.214783}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475145.405959}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475145.810356}
+{"type": "rc", "roll": 1500, "pitch": 1500, "throttle": 1500, "yaw": 1599, "system_time": 1778475145.829955}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475146.018844}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475146.1263292}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475146.421366}
+{"type": "rc", "roll": 1500, "pitch": 1500, "throttle": 1500, "yaw": 1599, "system_time": 1778475146.432947}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475148.552806}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475148.652965}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475148.855108}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475149.168463}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475150.379107}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475150.579419}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475150.8837209}
+{"type": "rc", "roll": 1500, "pitch": 1499, "throttle": 1500, "yaw": 1599, "system_time": 1778475150.896951}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475150.9847639}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475151.1875992}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475151.2988951}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475151.605203}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475152.111818}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475152.907926}
+{"type": "rc", "roll": 1447, "pitch": 1499, "throttle": 1500, "yaw": 1599, "system_time": 1778475152.920523}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475153.31388}
+{"type": "rc", "roll": 1491, "pitch": 1499, "throttle": 1500, "yaw": 1599, "system_time": 1778475153.330323}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475153.833798}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475154.747929}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475155.15061}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475155.762045}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475156.1702468}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475156.24863}
+{"type": "rc", "roll": 1598, "pitch": 1499, "throttle": 1500, "yaw": 1599, "system_time": 1778475156.2640169}
+{"type": "analog", "vbat": 23.1, "current": 0.06, "system_time": 1778475156.951502}
+{"type": "analog", "vbat": 23.2, "current": 0.2, "system_time": 1778475157.454738}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475157.5783281}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475157.676161}
+{"type": "rc", "roll": 1500, "pitch": 1499, "throttle": 1500, "yaw": 1599, "system_time": 1778475157.688622}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475158.0917969}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475158.2950358}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475158.385119}
+{"type": "rc", "roll": 1500, "pitch": 1499, "throttle": 1500, "yaw": 1599, "system_time": 1778475158.397876}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475158.489194}
+{"type": "rc", "roll": 1500, "pitch": 1499, "throttle": 1500, "yaw": 1599, "system_time": 1778475158.501484}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475158.994669}
+{"type": "rc", "roll": 1500, "pitch": 1499, "throttle": 1500, "yaw": 1599, "system_time": 1778475159.0162308}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475159.103539}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475159.316331}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475159.420647}
+{"type": "analog", "vbat": 23.2, "current": 0.0, "system_time": 1778475159.471207}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475159.827853}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475160.230407}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475160.3273191}
+{"type": "rc", "roll": 1500, "pitch": 1499, "throttle": 1500, "yaw": 1599, "system_time": 1778475160.339587}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475160.4350069}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475160.537867}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475160.628723}
+{"type": "rc", "roll": 1500, "pitch": 1499, "throttle": 1500, "yaw": 1599, "system_time": 1778475160.641202}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475160.830689}
+{"type": "rc", "roll": 1500, "pitch": 1499, "throttle": 1500, "yaw": 1599, "system_time": 1778475160.8431869}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475161.1361868}
+{"type": "rc", "roll": 1500, "pitch": 1499, "throttle": 1500, "yaw": 1599, "system_time": 1778475161.151399}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475161.3445718}
+{"type": "rc", "roll": 1500, "pitch": 1499, "throttle": 1500, "yaw": 1599, "system_time": 1778475161.350455}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475165.1853209}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475165.903691}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475166.300877}
+{"type": "rc", "roll": 1500, "pitch": 1499, "throttle": 1500, "yaw": 1599, "system_time": 1778475166.313173}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475166.4927292}
+{"type": "rc", "roll": 1500, "pitch": 1499, "throttle": 1500, "yaw": 1599, "system_time": 1778475166.514055}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475166.613325}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475166.915287}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475168.836256}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475169.1302788}
+{"type": "rc", "roll": 1500, "pitch": 1499, "throttle": 1500, "yaw": 1599, "system_time": 1778475169.143438}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475172.3825111}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475172.5843499}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475172.8895528}
+{"type": "rc", "roll": 1500, "pitch": 1499, "throttle": 1500, "yaw": 1599, "system_time": 1778475172.898942}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475175.3081238}
+{"type": "rc", "roll": 1500, "pitch": 1499, "throttle": 1500, "yaw": 1599, "system_time": 1778475175.320939}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475175.715549}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475175.826259}
+{"type": "analog", "vbat": 23.1, "current": 0.0, "system_time": 1778475178.543824}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475178.856412}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475179.371283}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475179.575307}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475180.088063}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475180.493181}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475180.898049}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475181.000347}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475183.329786}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475183.723064}
+{"type": "rc", "roll": 1500, "pitch": 1499, "throttle": 1500, "yaw": 1599, "system_time": 1778475183.7384498}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475183.836749}
+{"type": "analog", "vbat": 23.1, "current": 0.0, "system_time": 1778475184.587154}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475186.3762681}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475187.585328}
+{"type": "analog", "vbat": 23.1, "current": 0.06, "system_time": 1778475188.110296}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475190.312279}
+{"type": "rc", "roll": 1500, "pitch": 1499, "throttle": 1500, "yaw": 1599, "system_time": 1778475190.324623}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475190.412697}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475190.626621}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475191.221141}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475191.332959}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475191.63117}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475191.834062}
+{"type": "rc", "roll": 1500, "pitch": 1499, "throttle": 1500, "yaw": 1599, "system_time": 1778475191.847136}
+{"type": "analog", "vbat": 23.1, "current": 0.06, "system_time": 1778475192.107997}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475192.3488388}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475192.6448488}
+{"type": "rc", "roll": 1500, "pitch": 1499, "throttle": 1500, "yaw": 1599, "system_time": 1778475192.660042}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475193.060717}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475193.4564302}
+{"type": "rc", "roll": 1500, "pitch": 1499, "throttle": 1500, "yaw": 1599, "system_time": 1778475193.4716978}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475193.762441}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475193.865045}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475194.489345}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475194.591358}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475194.6904042}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475195.3931231}
+{"type": "rc", "roll": 1500, "pitch": 1499, "throttle": 1500, "yaw": 1599, "system_time": 1778475195.409247}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475195.594743}
+{"type": "rc", "roll": 1500, "pitch": 1499, "throttle": 1500, "yaw": 1599, "system_time": 1778475195.610306}
+{"type": "analog", "vbat": 23.1, "current": 0.06, "system_time": 1778475195.63159}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475195.8121521}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475196.0113878}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475196.103442}
+{"type": "rc", "roll": 1500, "pitch": 1499, "throttle": 1500, "yaw": 1599, "system_time": 1778475196.120666}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475196.31121}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475196.51398}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475197.524034}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475197.831746}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475198.126428}
+{"type": "rc", "roll": 1500, "pitch": 1499, "throttle": 1500, "yaw": 1599, "system_time": 1778475198.1394281}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475198.8484821}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475199.5642009}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475199.654001}
+{"type": "rc", "roll": 1500, "pitch": 1499, "throttle": 1500, "yaw": 1599, "system_time": 1778475199.667018}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475200.0695171}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475200.171506}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475200.3636339}
+{"type": "rc", "roll": 1500, "pitch": 1499, "throttle": 1500, "yaw": 1599, "system_time": 1778475200.376874}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475200.576492}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475200.777689}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475202.5133922}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475202.7127318}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475202.8144052}
+{"type": "rc", "roll": 1500, "pitch": 1499, "throttle": 1500, "yaw": 1599, "system_time": 1778475202.8282611}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475202.904484}
+{"type": "rc", "roll": 1500, "pitch": 1499, "throttle": 1500, "yaw": 1599, "system_time": 1778475202.9168599}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475203.0164962}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475203.10742}
+{"type": "rc", "roll": 1500, "pitch": 1499, "throttle": 1500, "yaw": 1599, "system_time": 1778475203.1196759}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475203.3135948}
+{"type": "rc", "roll": 1500, "pitch": 1499, "throttle": 1500, "yaw": 1599, "system_time": 1778475203.326842}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475203.427147}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475203.630962}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475203.832584}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475203.934916}
+{"type": "analog", "vbat": 23.2, "current": 0.0, "system_time": 1778475204.1470988}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475204.630953}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475205.658592}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475205.847147}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475206.152317}
+{"type": "rc", "roll": 1500, "pitch": 1499, "throttle": 1500, "yaw": 1599, "system_time": 1778475206.1638699}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475206.363772}
+{"type": "rc", "roll": 1500, "pitch": 1499, "throttle": 1500, "yaw": 1599, "system_time": 1778475206.377356}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475206.566132}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475206.667947}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475206.8626308}
+{"type": "rc", "roll": 1500, "pitch": 1499, "throttle": 1500, "yaw": 1599, "system_time": 1778475206.881481}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475207.3811998}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475207.586695}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475207.789008}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475208.093652}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475208.1948218}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475208.294774}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475208.6120052}
+{"type": "analog", "vbat": 23.1, "current": 0.0, "system_time": 1778475208.6704772}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475209.0135942}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475209.114676}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475209.213342}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475212.054233}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475212.156566}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475212.347691}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475212.552}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475212.6538508}
+{"type": "analog", "vbat": 23.1, "current": 0.0, "system_time": 1778475213.698234}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475215.694788}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475215.794851}
+{"type": "rc", "roll": 1500, "pitch": 1499, "throttle": 1500, "yaw": 1599, "system_time": 1778475215.809974}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475215.9035351}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475216.5121212}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475219.843364}
+{"type": "rc", "roll": 1500, "pitch": 1499, "throttle": 1500, "yaw": 1600, "system_time": 1778475219.855812}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475220.257517}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475220.6559072}
+{"type": "rc", "roll": 1500, "pitch": 1499, "throttle": 1500, "yaw": 1600, "system_time": 1778475220.67457}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475220.8532}
+{"type": "rc", "roll": 1500, "pitch": 1499, "throttle": 1500, "yaw": 1600, "system_time": 1778475220.866504}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475221.26842}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475221.380045}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475221.583937}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475221.874837}
+{"type": "rc", "roll": 1500, "pitch": 1499, "throttle": 1500, "yaw": 1600, "system_time": 1778475221.889769}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475221.9776971}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475222.088622}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475222.2802649}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475222.3800719}
+{"type": "rc", "roll": 1500, "pitch": 1499, "throttle": 1500, "yaw": 1600, "system_time": 1778475222.39293}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475222.489158}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475222.5823958}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475223.6119082}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475223.7979069}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475224.119658}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475224.314108}
+{"type": "rc", "roll": 1500, "pitch": 1499, "throttle": 1500, "yaw": 1600, "system_time": 1778475224.326497}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475224.613636}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475225.026741}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475225.13012}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475225.4227042}
+{"type": "rc", "roll": 1500, "pitch": 1499, "throttle": 1500, "yaw": 1600, "system_time": 1778475225.436706}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475225.535342}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475225.6349518}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475225.849449}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475225.943257}
+{"type": "rc", "roll": 1500, "pitch": 1499, "throttle": 1500, "yaw": 1600, "system_time": 1778475225.952936}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475227.361342}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475227.5607512}
+{"type": "analog", "vbat": 23.1, "current": 0.0, "system_time": 1778475227.767733}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475228.781054}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475229.085672}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475229.400239}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475229.490552}
+{"type": "rc", "roll": 1500, "pitch": 1499, "throttle": 1500, "yaw": 1600, "system_time": 1778475229.502922}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475229.801306}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475229.90321}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475230.301538}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475230.599863}
+{"type": "rc", "roll": 1500, "pitch": 1499, "throttle": 1500, "yaw": 1600, "system_time": 1778475230.621957}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475230.7104871}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475230.823064}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475230.903987}
+{"type": "rc", "roll": 1500, "pitch": 1499, "throttle": 1500, "yaw": 1600, "system_time": 1778475230.918109}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475231.12694}
+{"type": "analog", "vbat": 23.1, "current": 0.06, "system_time": 1778475231.2636921}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475232.025878}
+{"type": "rc", "roll": 1500, "pitch": 1499, "throttle": 1500, "yaw": 1600, "system_time": 1778475232.039287}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475232.4500139}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475232.5521631}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475232.836381}
+{"type": "rc", "roll": 1500, "pitch": 1499, "throttle": 1500, "yaw": 1600, "system_time": 1778475232.8489861}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475233.139932}
+{"type": "rc", "roll": 1500, "pitch": 1499, "throttle": 1500, "yaw": 1600, "system_time": 1778475233.1564548}
+{"type": "analog", "vbat": 23.1, "current": 0.0, "system_time": 1778475234.276512}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475236.9087858}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475237.300032}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475237.616247}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475238.328366}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475238.8345249}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475239.126579}
+{"type": "rc", "roll": 1500, "pitch": 1499, "throttle": 1500, "yaw": 1600, "system_time": 1778475239.140167}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475239.341283}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475239.653544}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475239.958797}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475240.06144}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475240.362716}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475240.6561139}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475240.8563452}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475241.359587}
+{"type": "rc", "roll": 1500, "pitch": 1499, "throttle": 1500, "yaw": 1600, "system_time": 1778475241.384246}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475241.5851982}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475241.6750379}
+{"type": "rc", "roll": 1500, "pitch": 1499, "throttle": 1500, "yaw": 1600, "system_time": 1778475241.688268}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475241.877393}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475242.175308}
+{"type": "rc", "roll": 1500, "pitch": 1499, "throttle": 1500, "yaw": 1600, "system_time": 1778475242.188541}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475242.378416}
+{"type": "rc", "roll": 1500, "pitch": 1499, "throttle": 1500, "yaw": 1600, "system_time": 1778475242.3939111}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475242.5973692}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475242.797214}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475243.09101}
+{"type": "rc", "roll": 1500, "pitch": 1499, "throttle": 1500, "yaw": 1600, "system_time": 1778475243.103436}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475243.1916428}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475243.295833}
+{"type": "rc", "roll": 1500, "pitch": 1499, "throttle": 1500, "yaw": 1600, "system_time": 1778475243.3094752}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475243.402784}
+{"type": "rc", "roll": 1500, "pitch": 1499, "throttle": 1500, "yaw": 1600, "system_time": 1778475243.413037}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475244.3231518}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475244.713639}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475245.128254}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475245.331962}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475245.725569}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475245.844479}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475245.929429}
+{"type": "rc", "roll": 1500, "pitch": 1499, "throttle": 1500, "yaw": 1600, "system_time": 1778475245.9449668}
+{"type": "analog", "vbat": 23.1, "current": 0.0, "system_time": 1778475246.8232372}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475246.861813}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475247.064996}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475247.2568362}
+{"type": "analog", "vbat": 23.1, "current": 0.0, "system_time": 1778475249.853119}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475249.90605}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475250.086139}
+{"type": "rc", "roll": 1500, "pitch": 1597, "throttle": 1500, "yaw": 1600, "system_time": 1778475250.097942}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475250.408978}
+{"type": "analog", "vbat": 23.1, "current": 0.0, "system_time": 1778475251.3583539}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475253.852138}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475253.942164}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475254.1562848}
+{"type": "rc", "roll": 1500, "pitch": 1500, "throttle": 1500, "yaw": 1600, "system_time": 1778475254.169492}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475255.05559}
+{"type": "rc", "roll": 1500, "pitch": 1500, "throttle": 1500, "yaw": 1600, "system_time": 1778475255.069068}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475255.3810298}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475255.5767732}
+{"type": "rc", "roll": 1500, "pitch": 1500, "throttle": 1500, "yaw": 1600, "system_time": 1778475255.589073}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475255.8788311}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475256.281705}
+{"type": "rc", "roll": 1500, "pitch": 1500, "throttle": 1500, "yaw": 1600, "system_time": 1778475256.2945971}
+{"type": "analog", "vbat": 23.1, "current": 0.0, "system_time": 1778475256.373923}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475256.383095}
+{"type": "rc", "roll": 1500, "pitch": 1500, "throttle": 1500, "yaw": 1600, "system_time": 1778475256.395745}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475256.5944371}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475256.989847}
+{"type": "rc", "roll": 1500, "pitch": 1500, "throttle": 1500, "yaw": 1656, "system_time": 1778475257.004273}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475257.193672}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475257.4053388}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475258.010099}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475258.109422}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475258.3218508}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475258.5242}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475258.628384}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475258.832704}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475259.2272809}
+{"type": "rc", "roll": 1500, "pitch": 1500, "throttle": 1500, "yaw": 1600, "system_time": 1778475259.245662}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475259.3422232}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475259.638844}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475259.951752}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475260.154916}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475260.35794}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475260.85856}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475261.1651242}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475261.571851}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475265.10807}
+{"type": "rc", "roll": 1500, "pitch": 1500, "throttle": 1500, "yaw": 1600, "system_time": 1778475265.129298}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475265.531996}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475265.631619}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475269.892213}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475270.0828931}
+{"type": "rc", "roll": 1500, "pitch": 1500, "throttle": 1500, "yaw": 1600, "system_time": 1778475270.097356}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475270.496424}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475270.586535}
+{"type": "rc", "roll": 1500, "pitch": 1500, "throttle": 1500, "yaw": 1600, "system_time": 1778475270.59938}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475270.789031}
+{"type": "rc", "roll": 1500, "pitch": 1500, "throttle": 1500, "yaw": 1600, "system_time": 1778475270.804173}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475270.900574}
+{"type": "analog", "vbat": 23.1, "current": 0.06, "system_time": 1778475270.925194}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475272.41988}
+{"type": "rc", "roll": 1500, "pitch": 1500, "throttle": 1500, "yaw": 1656, "system_time": 1778475272.432706}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475273.136587}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475273.331548}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475273.442945}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475273.859339}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475273.939219}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475274.151526}
+{"type": "rc", "roll": 1500, "pitch": 1500, "throttle": 1500, "yaw": 1601, "system_time": 1778475274.1675541}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475274.355604}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475274.665537}
+{"type": "attitude", "roll": 1.1, "pitch": 0.4, "yaw": 0, "system_time": 1778475274.952824}
+{"type": "rc", "roll": 1500, "pitch": 1500, "throttle": 1500, "yaw": 1600, "system_time": 1778475274.975081}
+{"type": "analog", "vbat": 23.1, "current": 0.06, "system_time": 1778475276.9439218}
+{"type": "analog", "vbat": 23.1, "current": 0.0, "system_time": 1778475278.446177}
