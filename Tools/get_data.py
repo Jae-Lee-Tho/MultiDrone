@@ -9,10 +9,10 @@ import json
 # CONFIGURATION
 # =============================================================================
 CSV_FILENAME = "experiment_results.csv"
-N_TRIALS_PER_COMMAND = 5   # Change this to 10, 20, etc.
-TRIAL_TIMEOUT_SEC = 5.0    # How long to wait for a successful command before giving up
+N_TRIALS_PER_COMMAND = 5   # ✏️ TUNE: Change to 10, 20, etc.
+TRIAL_TIMEOUT_SEC = 5.0    # ✏️ TUNE: Wait time before giving up on a trial
 
-EXPERIMENTS =["VOICE_ONLY", "EEG_ONLY", "BOTH"]
+EXPERIMENTS = ["VOICE_ONLY", "EEG_ONLY", "BOTH"]
 
 COMMANDS =[
     "TAKEOFF", "LAND", "FORWARD", "BACKWARD",
@@ -112,7 +112,7 @@ def run_tests():
                 print(f"\n--- [ {trial_id} ] ---")
 
                 # --- PREPARE TRIAL ---
-                if exp_type in["VOICE_ONLY", "BOTH"]:
+                if exp_type in ["VOICE_ONLY", "BOTH"]:
                     print(f"🗣️  Get ready to SAY: '{target_cmd}'")
                 if exp_type in ["EEG_ONLY", "BOTH"]:
                     print(f"🧠  System will auto-inject EEG for: '{target_cmd}'")
@@ -128,7 +128,7 @@ def run_tests():
                 clear_telemetry_buffer()
                 print(">>> GO! <<<")
 
-                start_time = time.time()
+                start_time = time.time() # Used for Timeout and automated EEG trigger time
 
                 # --- TRIGGER EEG AUTOMATICALLY ---
                 if exp_type in ["EEG_ONLY", "BOTH"]:
@@ -166,10 +166,29 @@ def run_tests():
                         if telem.get("eeg_cmd"):
                             eeg_detected = telem["eeg_cmd"]
 
-                        # Track Final Fusion Execution
+                        # Track Final Fusion Execution & LATENCY CALCULATION
                         if telem.get("final_cmd"):
                             final_executed = telem["final_cmd"]
-                            latency = round(time.time() - start_time, 3)
+
+                            # Grab the precise audio-onset timestamp from main_bci.py
+                            voice_onset = telem.get("voice_onset_time", 0.0)
+
+                            # Calculate Latency Based on Mode
+                            if exp_type == "VOICE_ONLY" and voice_onset > 0.0:
+                                latency_val = time.time() - voice_onset
+                            elif exp_type == "EEG_ONLY":
+                                latency_val = time.time() - start_time
+                            elif exp_type == "BOTH":
+                                # For BOTH, latency starts from whichever signal fired FIRST.
+                                if voice_onset > 0.0:
+                                    first_signal = min(start_time, voice_onset)
+                                else:
+                                    first_signal = start_time
+                                latency_val = time.time() - first_signal
+                            else:
+                                latency_val = time.time() - start_time
+
+                            latency = round(latency_val, 3)
                             print(f"✅ Executed: {final_executed} (Latency: {latency}s)")
                             break  # Success! End trial early.
 
@@ -205,4 +224,4 @@ if __name__ == "__main__":
     try:
         run_tests()
     except KeyboardInterrupt:
-        print("\n\n[PAUSED] Test runner stopped by user. Run again to resume.")
+        print("\n\n[PAUSED] Test runner stopped by user. Run again to resume.")\

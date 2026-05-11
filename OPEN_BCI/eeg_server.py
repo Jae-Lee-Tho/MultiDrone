@@ -136,7 +136,7 @@ try:
             char_cmd = data.decode('utf-8').strip().lower()
             if char_cmd in COMMAND_MAPPING:
                 auto_trigger_key = char_cmd
-        except BlockingIOError:
+        except (BlockingIOError, OSError): # Catches non-blocking empty socket errors safely on both Win/Mac
             pass
 
         # 2. Inject on keypress OR UDP trigger, only when idle
@@ -154,7 +154,7 @@ try:
                 src = "AUTO-UDP" if auto_trigger_key else "KEYBOARD"
                 print(f"[INJECT - {src}] '{trigger_key.upper()}' → streaming {filename}")
                 injection_buffer = load_random_snippet(trigger_key)
-                time.sleep(0.20)  # debounce
+                # Removed time.sleep(0.20) here so the 256Hz clock stays perfectly synced!
 
         # 3. Build sample
         if injection_buffer:
@@ -168,9 +168,11 @@ try:
 
         next_sample_time += 1.0 / FS
         drift = next_sample_time - time.perf_counter()
+
         if drift > 0:
             time.sleep(drift)
         else:
+            # If we fall behind, catch the internal clock up
             next_sample_time = time.perf_counter()
 
 except KeyboardInterrupt:

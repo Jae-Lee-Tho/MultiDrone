@@ -29,19 +29,6 @@
 // =============================================================================
 // SECTION 1 — WI-FI CONFIGURATION
 // =============================================================================
-// Two modes available. Change WIFI_MODE to switch between them.
-//
-//   SOFTAP mode  → ESP32 creates its own Wi-Fi hotspot.
-//                  The Laptop connects directly to the ESP32.
-//                  Best for flying: no router dependency.
-//                  ESP32's IP will be 192.168.4.1 (update ESP32_IP in
-//                  main_bci.py to match).
-//
-//   CLIENT mode  → ESP32 joins an existing network (router or phone).
-//                  Easier for indoor testing but adds latency.
-//                  Check your router for the ESP32's assigned IP,
-//                  then update main_bci.py.
-// =============================================================================
 
 #define WIFI_SOFTAP  0   // ESP32 creates its own hotspot (recommended for flying)
 #define WIFI_CLIENT  1   // ESP32 joins an existing network
@@ -69,7 +56,7 @@ const uint16_t UDP_PORT = 4210;   // must match ESP32_PORT in main_bci.py
 // =============================================================================
 
 #define MSP_SET_RAW_RC   200
-#define RC_CHANNEL_COUNT 5    // roll, pitch, throttle, yaw, arm — must match Python
+#define RC_CHANNEL_COUNT 5    // roll, pitch, yaw, throttle, arm — must match Python
 
 
 // =============================================================================
@@ -87,7 +74,7 @@ const uint16_t UDP_PORT = 4210;   // must match ESP32_PORT in main_bci.py
 // =============================================================================
 
 WiFiUDP udp;
-char    udpBuffer[64];   // large enough for "1500,1500,1000,1500,1000\0"
+char    udpBuffer[64];   // large enough for "1500,1500,1500,1000,1000\0"
 
 IPAddress laptopIP;
 bool      laptopConnected = false;
@@ -99,7 +86,7 @@ bool          watchdogTriggered = false;
 unsigned long lastAttitudeReq   = 0;
 unsigned long lastAnalogReq     = 0;
 unsigned long lastRcReq         = 0;
-unsigned long lastAltReq = 0; // For Alt measuring variable
+unsigned long lastAltReq        = 0; // For Alt measuring variable
 
 
 // =============================================================================
@@ -179,12 +166,14 @@ void parseMspByte(uint8_t c) {
                     udp.beginPacket(laptopIP, TELEMETRY_PORT);
                     udp.print(jsonBuf);
                     udp.endPacket();
-                
+
                 } else if(mspCommand == 109 && laptopConnected) { // MSP_ALTITUDE
-                    // Payload is 32-bit estimated altitude (cm) followed by 16-bit variometer (cm/s)
-                    int32_t altCm = mspPayloadBuffer[0] | (mspPayloadBuffer[1] << 8) | 
-                                    (mspPayloadBuffer[2] << 16) | (mspPayloadBuffer[3] << 24);
-                    
+                    // FIX: Must explicitly cast to int32_t before shifting to prevent C++ overflow
+                    int32_t altCm = (int32_t)mspPayloadBuffer[0] |
+                                   ((int32_t)mspPayloadBuffer[1] << 8) |
+                                   ((int32_t)mspPayloadBuffer[2] << 16) |
+                                   ((int32_t)mspPayloadBuffer[3] << 24);
+
                     float altMeters = altCm / 100.0;
 
                     char jsonBuf[128];
@@ -325,7 +314,8 @@ void loop() {
             udpBuffer[len] = '\0';
 
             // Step 2: Parse CSV into channel values
-            uint16_t channels[RC_CHANNEL_COUNT] = {1500, 1500, 1000, 1500, 1000};
+            // FIX: Order is Roll, Pitch, Yaw, Throttle, Arm
+            uint16_t channels[RC_CHANNEL_COUNT] = {1500, 1500, 1500, 1000, 1000};
             char* token = strtok(udpBuffer, ",");
             for (int i = 0; i < RC_CHANNEL_COUNT && token != nullptr; i++) {
                 channels[i] = (uint16_t)atoi(token);
@@ -341,7 +331,8 @@ void loop() {
     // If we haven't received a packet from the laptop recently, disarm and cut throttle.
     if (laptopConnected && !watchdogTriggered && (now - lastUdpPacketTime > WATCHDOG_TIMEOUT_MS)) {
         Serial.println("[ESP32] WARNING: UDP timeout! Triggering RX Failsafe (Throttle 1000, Disarm).");
-        uint16_t failsafeChannels[RC_CHANNEL_COUNT] = {1500, 1500, 1000, 1500, 1000};
+        // FIX: Order is Roll, Pitch, Yaw, Throttle, Arm
+        uint16_t failsafeChannels[RC_CHANNEL_COUNT] = {1500, 1500, 1500, 1000, 1000};
         sendMspSetRawRc(failsafeChannels, RC_CHANNEL_COUNT);
         watchdogTriggered = true;
     }
@@ -369,8 +360,6 @@ void loop() {
         lastAltReq = now;
         requestMsp(109); // 109 = MSP_ALTITUDE
     }
-
-
 
     // Process incoming bytes from Betaflight
     while (FC_SERIAL.available()) {
