@@ -46,7 +46,7 @@ def load_completed_trials():
     """Reads the CSV and returns a set of completed trial IDs to support resuming."""
     completed = set()
     if not os.path.exists(CSV_FILENAME):
-        # Create file and write headers
+        # Create file and write headers clearly so Excel is easy to read
         with open(CSV_FILENAME, mode='w', newline='') as f:
             writer = csv.writer(f)
             writer.writerow([
@@ -112,7 +112,7 @@ def run_tests():
                 print(f"\n--- [ {trial_id} ] ---")
 
                 # --- PREPARE TRIAL ---
-                if exp_type in ["VOICE_ONLY", "BOTH"]:
+                if exp_type in["VOICE_ONLY", "BOTH"]:
                     print(f"🗣️  Get ready to SAY: '{target_cmd}'")
                 if exp_type in ["EEG_ONLY", "BOTH"]:
                     print(f"🧠  System will auto-inject EEG for: '{target_cmd}'")
@@ -189,7 +189,6 @@ def run_tests():
                                 latency_val = time.time() - start_time
 
                             latency = round(latency_val, 3)
-                            print(f"✅ Executed: {final_executed} (Latency: {latency}s)")
                             break  # Success! End trial early.
 
                     except socket.timeout:
@@ -198,10 +197,25 @@ def run_tests():
                         continue
 
                 # --- TRIAL FINISHED (Success or Timeout) ---
+                cca_accepted = max_cca_score >= CCA_CONFIDENCE_THRESHOLD
+
+                # Print a clean, labeled scorecard for this trial
+                print("\n" + "="*45)
+                print(f" 📊 TRIAL RESULTS: {trial_id}")
+                print("="*45)
+                print(f" Target Command  : {target_cmd}")
+                print(f" Voice Detected  : {voice_detected}")
+                print(f" EEG Detected    : {eeg_detected}")
+                print(f" CCA Max Score   : {max_cca_score:.4f}")
+                print(f" CCA Accepted?   : {cca_accepted}")
+                print(f" Final Executed  : {final_executed}")
+                print(f" Latency (sec)   : {latency}")
+                print("="*45)
+
                 if final_executed == "NA":
                     print("❌ Timeout reached. Command failed or mismatched.")
-
-                cca_accepted = max_cca_score >= CCA_CONFIDENCE_THRESHOLD
+                else:
+                    print("✅ Command executed successfully!")
 
                 # --- SAVE ROW TO CSV ---
                 row =[
@@ -224,4 +238,4 @@ if __name__ == "__main__":
     try:
         run_tests()
     except KeyboardInterrupt:
-        print("\n\n[PAUSED] Test runner stopped by user. Run again to resume.")\
+        print("\n\n[PAUSED] Test runner stopped by user. Run again to resume.")
