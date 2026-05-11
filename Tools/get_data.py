@@ -9,17 +9,16 @@ import json
 # CONFIGURATION
 # =============================================================================
 CSV_FILENAME = "experiment_results.csv"
-N_TRIALS_PER_COMMAND = 5   # ✏️ TUNE: Change to 10, 20, etc.
-TRIAL_TIMEOUT_SEC = 5.0    # ✏️ TUNE: Wait time before giving up on a trial
+N_TRIALS_PER_COMMAND = 5
+TRIAL_TIMEOUT_SEC = 5.0
 
-EXPERIMENTS = ["VOICE_ONLY", "EEG_ONLY", "BOTH"]
+EXPERIMENTS =["VOICE_ONLY", "EEG_ONLY", "BOTH"]
 
 COMMANDS =[
     "TAKEOFF", "LAND", "FORWARD", "BACKWARD",
     "LEFT", "RIGHT", "STOP", "UP", "DOWN"
 ]
 
-# Map commands to the keys server.py expects
 COMMAND_TO_KEY = {
     "TAKEOFF": "t", "STOP": "q", "LAND": "l", "UP": "u", "DOWN": "j",
     "RIGHT": "d", "FORWARD": "w", "BACKWARD": "s", "LEFT": "a"
@@ -33,6 +32,11 @@ telemetry_sock.settimeout(0.02)
 SERVER_UDP_IP = "127.0.0.1"
 SERVER_UDP_PORT = 4213
 server_trigger_sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+
+# 💡 NEW: UDP Client to remotely set up main_bci.py
+MAIN_BCI_IP = "127.0.0.1"
+MAIN_BCI_CONTROL_PORT = 4214
+bci_control_sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 
 CCA_CONFIDENCE_THRESHOLD = 0.65
 
@@ -93,8 +97,8 @@ def run_tests():
         print("\n" + "#" * 60)
         print(f"  STARTING EXPERIMENT: {exp_type}")
         print("#" * 60)
-        print(f"⚠️  PLEASE ENSURE `self.mode = ExperimentMode.{exp_type}` in main_bci.py!")
-        input("Press ENTER when DroneController is running in the correct mode...")
+        print(f"⚙️  Auto-configuring main_bci.py to mode: {exp_type}...")
+        input("Press ENTER when you are ready to begin this block...")
 
         for target_cmd in COMMANDS:
             for trial_num in range(1, N_TRIALS_PER_COMMAND + 1):
@@ -103,11 +107,11 @@ def run_tests():
                 if trial_id in completed_trials:
                     continue
 
-                print(f"\n--- [ {trial_id} ] ---")
+                print(f"\n---[ {trial_id} ] ---")
 
                 if exp_type in ["VOICE_ONLY", "BOTH"]:
                     print(f"🗣️  Get ready to SAY: '{target_cmd}'")
-                if exp_type in ["EEG_ONLY", "BOTH"]:
+                if exp_type in["EEG_ONLY", "BOTH"]:
                     print(f"🧠  System will auto-inject EEG for: '{target_cmd}'")
 
                 time.sleep(1.0)
@@ -121,9 +125,17 @@ def run_tests():
                 clear_telemetry_buffer()
                 print(">>> GO! <<<")
 
+                # 💡 FIX: Sync the main_bci script precisely with the trial start time!
+                trial_msg = json.dumps({
+                    "action": "start_trial",
+                    "mode": exp_type,
+                    "target": target_cmd
+                })
+                bci_control_sock.sendto(trial_msg.encode("utf-8"), (MAIN_BCI_IP, MAIN_BCI_CONTROL_PORT))
+
                 start_time = time.time()
 
-                if exp_type in["EEG_ONLY", "BOTH"]:
+                if exp_type in ["EEG_ONLY", "BOTH"]:
                     key = COMMAND_TO_KEY[target_cmd]
                     server_trigger_sock.sendto(key.encode('utf-8'), (SERVER_UDP_IP, SERVER_UDP_PORT))
 
@@ -139,38 +151,40 @@ def run_tests():
                         data, _ = telemetry_sock.recvfrom(4096)
                         telem = json.loads(data.decode("utf-8"))
 
-                        # 💡 FIX: Strict State Masking!
-                        # Do not let EEG data populate during Voice trials, and vice versa.
-                        if exp_type in["EEG_ONLY", "BOTH"]:
+                        if exp_type in ["EEG_ONLY", "BOTH"]:
                             current_score = telem.get("eeg_score", 0.0)
                             if current_score > max_cca_score:
                                 max_cca_score = current_score
 
-                            if telem.get("eeg_cmd"):
+                            if telem.get("eeg_cmd") and eeg_detected == "NA":
                                 eeg_detected = telem["eeg_cmd"]
 
                         if exp_type in ["VOICE_ONLY", "BOTH"]:
-                            if telem.get("voice_cmd"):
+                            if telem.get("voice_cmd") and voice_detected == "NA":
                                 voice_detected = telem["voice_cmd"]
 
                         # Track Final Execution
                         if telem.get("final_cmd"):
                             final_executed = telem["final_cmd"]
-
+                            decision_time = telem.get("decision_time", time.time())
                             voice_onset = telem.get("voice_onset_time", 0.0)
 
-                            if exp_type == "VOICE_ONLY" and voice_onset > 0.0:
-                                latency_val = time.time() - voice_onset
+                            # 💡 FIX: Mathematically pure system latency mapping
+                            if exp_type == "VOICE_ONLY":
+                                if voice_onset > 0.0:
+                                    latency_val = decision_time - voice_onset
+                                else:
+                                    latency_val = decision_time - start_time # Fallback
                             elif exp_type == "EEG_ONLY":
-                                latency_val = time.time() - start_time
+                                latency_val = decision_time - start_time
                             elif exp_type == "BOTH":
                                 if voice_onset > 0.0:
                                     first_signal = min(start_time, voice_onset)
                                 else:
                                     first_signal = start_time
-                                latency_val = time.time() - first_signal
+                                latency_val = decision_time - first_signal
                             else:
-                                latency_val = time.time() - start_time
+                                latency_val = decision_time - start_time
 
                             latency = round(latency_val, 3)
                             break

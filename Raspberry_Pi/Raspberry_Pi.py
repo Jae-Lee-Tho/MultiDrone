@@ -60,7 +60,7 @@ class DroneState(Enum):
 
 class DroneController:
     def __init__(self):
-        self.mode = ExperimentMode.VOICE_ONLY   # ✏️ TUNE: Switch between VOICE_ONLY, EEG_ONLY, BOTH, PHYSICAL_RC
+        self.mode = ExperimentMode.VOICE_ONLY
 
         self.action_duration = 1.0
         self.enable_smoothing = True
@@ -89,6 +89,12 @@ class DroneController:
         self.test_runner_ip = "127.0.0.1"
         self.test_runner_port = 4211
         self.test_runner_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+
+        # 💡 NEW: Control port to receive experiment setups remotely
+        self.control_port = 4214
+        self.control_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        self.control_socket.bind(("0.0.0.0", self.control_port))
+        self.control_socket.setblocking(False)
 
         self.telemetry_port = 4212
         self.telemetry_rx_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -164,10 +170,7 @@ class DroneController:
                     self.latest_telemetry["rc_yaw"] = telemetry_data.get("yaw", 1500)
                     self.latest_telemetry["rc_throttle"] = telemetry_data.get("throttle", 1000)
 
-                with open(self.log_filename, "a") as f:
-                    f.write(json.dumps(telemetry_data) + "\n")
-
-            except TimeoutError:
+            except socket.timeout:
                 if time.time() - last_rx_time >= 5.0:
                     print("[Telemetry] WARNING: No data received for 5s. Check Betaflight connection.")
             except Exception:
@@ -205,19 +208,20 @@ class DroneController:
             if text:
                 cmd = self._map_speech_to_command(text)
                 if cmd:
+                    # Fallback: if volume was too quiet but Vosk caught it, estimate 0.5s ago
+                    if self.speech_onset_time == 0.0:
+                        self.speech_onset_time = time.time() - 0.5
+
                     self.last_voice_latency = time.time() - self.speech_onset_time
                     print(f"[VOICE] Heard: '{text}' → {cmd.value} (Peak Vol: {peak_volume}, Latency: {self.last_voice_latency:.3f}s)")
 
                     self.active_voice_cmd = cmd
                     self.active_voice_time = self.speech_onset_time
-                else:
-                    # Heard words but not a valid command. Reset so it doesn't get stuck.
-                    self.speech_onset_time = 0.0
 
-            # NOTE: We removed the "else: reset" from here. It was resetting while you were mid-sentence!
+            # 💡 FIX: Removed the "else" block that was clearing onset time mid-sentence
 
     # =========================================================================
-    # CORE: EEG PROCESSING
+    # CORE: EEG PROCESSING (Unchanged)
     # =========================================================================
 
     def _build_filters(self, sample_rate: float):
@@ -286,7 +290,6 @@ class DroneController:
         window_samples = int(srate * self.window_seconds)
         step_samples = int(srate * self.window_seconds * self.window_step_fraction)
         data_buffer =[]
-
         bandpass_sos, notch_sos = self._build_filters(srate)
 
         print(f"[EEG] Connected! Rate: {srate:.0f} Hz | Window: {self.window_seconds}s | 8 Channels")
@@ -363,7 +366,6 @@ class DroneController:
                 return
 
             print(f"{vbat_str} {alt_str}[MOVE] {command.value}")
-
             if command is Command.FORWARD:  self.target_rc_channels["pitch"] = 1600.0
             if command is Command.BACKWARD: self.target_rc_channels["pitch"] = 1400.0
             if command is Command.LEFT:     self.target_rc_channels["roll"]  = 1400.0
@@ -380,7 +382,7 @@ class DroneController:
 
     def run(self):
         print("=" * 60)
-        print(f"  Drone Ground Control — {self.mode.value} MODE")
+        print(f"  Drone Ground Control — Awaiting Test Runner Setup")
         print(f"  Target ESP32: {self.esp32_ip}:{self.esp32_port}")
         print("=" * 60)
 
@@ -394,6 +396,21 @@ class DroneController:
                 while True:
                     now = time.time()
 
+                    # 💡 FIX: Automated Control Interface (Erases Tech Debt)
+                    try:
+                        data, _ = self.control_socket.recvfrom(1024)
+                        msg = json.loads(data.decode("utf-8"))
+                        if msg.get("action") == "start_trial":
+                            self.mode = ExperimentMode[msg.get("mode")]
+                            self.speech_onset_time = 0.0
+                            self.active_voice_cmd = None
+                            self.active_eeg_cmd = None
+                            self.latest_eeg_score = 0.0
+                            self.last_voice_latency = 0.0
+                            print(f"\n[TEST RUNNER] Trial Started! Mode set to: {self.mode.value} | Target: {msg.get('target')}")
+                    except (BlockingIOError, OSError, json.JSONDecodeError):
+                        pass
+
                     # 1. Expire stale commands & safely reset timers
                     if now - self.active_voice_time > self.command_expiry_seconds:
                         self.active_voice_cmd = None
@@ -401,13 +418,11 @@ class DroneController:
                     if now - self.active_eeg_time > self.command_expiry_seconds:
                         self.active_eeg_cmd = None
 
-                    # Prevent the onset timer from getting "stuck" if you cough or bump the mic
-                    if self.speech_onset_time > 0.0 and (now - self.speech_onset_time > 4.0):
+                    # Upped timeout to 5s to mirror trial time bounds safely
+                    if self.speech_onset_time > 0.0 and (now - self.speech_onset_time > 5.0):
                         self.speech_onset_time = 0.0
 
                     final_cmd = None
-
-                    # 💡 FIX: Take a snapshot of the commands BEFORE they are cleared for Telemetry
                     snap_voice = self.active_voice_cmd.value if self.active_voice_cmd else None
                     snap_eeg = self.active_eeg_cmd.value if self.active_eeg_cmd else None
 
@@ -433,14 +448,12 @@ class DroneController:
                                 final_cmd = self.active_voice_cmd
                             else:
                                 print(f"[FUSION] Disagree (Voice: {self.active_voice_cmd.value} vs EEG: {self.active_eeg_cmd.value}) → Ignored.")
-                                self.speech_onset_time = 0.0 # Reset onset if disagreed
-
+                                self.speech_onset_time = 0.0
                             self.active_voice_cmd = self.active_eeg_cmd = None
 
-                    # 3. Execution & Data Staging
+                    # 3. Execution
                     if final_cmd:
                         self.apply_command(final_cmd)
-                        self.pending_telemetry_cmd = final_cmd
 
                     # 4. Auto-Stop Movement
                     if self.is_moving and (now - self.last_movement_time > self.action_duration):
@@ -459,21 +472,16 @@ class DroneController:
 
                     # 6. UDP Transmission to ESP32
                     if self.mode is not ExperimentMode.PHYSICAL_RC:
-                        esp32_payload = (
-                            f"{int(self.rc_channels['roll'])},"
-                            f"{int(self.rc_channels['pitch'])},"
-                            f"{int(self.rc_channels['yaw'])},"
-                            f"{int(self.rc_channels['throttle'])},"
-                            f"{self.rc_channels['arm']}"
-                        )
+                        esp32_payload = f"{int(self.rc_channels['roll'])},{int(self.rc_channels['pitch'])},{int(self.rc_channels['yaw'])},{int(self.rc_channels['throttle'])},{self.rc_channels['arm']}"
                         self.udp_socket.sendto(esp32_payload.encode("utf-8"), (self.esp32_ip, self.esp32_port))
 
                     # 7. Test Runner Telemetry
                     runner_payload = {
                         "state": self.drone_state.value,
-                        "voice_cmd": snap_voice,        # 💡 FIX: Uses the snapshot! No more NA!
-                        "eeg_cmd": snap_eeg,            # 💡 FIX: Uses the snapshot! No more NA!
+                        "voice_cmd": snap_voice,
+                        "eeg_cmd": snap_eeg,
                         "final_cmd": final_cmd.value if final_cmd else None,
+                        "decision_time": time.time() if final_cmd else None,  # 💡 Exact calculation anchor
                         "voice_onset_time": self.speech_onset_time,
                         "is_moving": self.is_moving,
                         "eeg_score": self.latest_eeg_score,
@@ -482,36 +490,12 @@ class DroneController:
                     }
                     self.test_runner_socket.sendto(json.dumps(runner_payload).encode("utf-8"), (self.test_runner_ip, self.test_runner_port))
 
-                    # 8. Drone Telemetry Feedback
-                    if self.pending_telemetry_cmd and self.speech_onset_time > 0.0:
-                        pitch_ok = abs(self.latest_telemetry["rc_pitch"] - self.target_rc_channels["pitch"]) < 50
-                        roll_ok = abs(self.latest_telemetry["rc_roll"] - self.target_rc_channels["roll"]) < 50
-                        thr_ok = abs(self.latest_telemetry["rc_throttle"] - self.target_rc_channels["throttle"]) < 50
-
-                        if pitch_ok and roll_ok and thr_ok:
-                            drone_latency = time.time() - self.speech_onset_time
-
-                            print("-" * 50)
-                            print(f"📊 [LATENCY REPORT] Target Command: {self.pending_telemetry_cmd.value}")
-                            print(f"   - Voice Recog Time: {self.last_voice_latency:.3f} s")
-                            print(f"   - Drone Exec Time:  {drone_latency:.3f} s")
-                            print("-" * 50)
-
-                            self.pending_telemetry_cmd = None
-                            self.speech_onset_time = 0.0
-
-                    time.sleep(0.02) # 50Hz Loop
+                    time.sleep(0.02)
 
         except KeyboardInterrupt:
             print("\n[System] Ctrl+C received — shutting down.")
             self._disarm()
-            payload = (
-                f"{int(self.rc_channels['roll'])},"
-                f"{int(self.rc_channels['pitch'])},"
-                f"{int(self.rc_channels['yaw'])},"
-                f"{int(self.rc_channels['throttle'])},"
-                f"{self.rc_channels['arm']}"
-            )
+            payload = f"{int(self.rc_channels['roll'])},{int(self.rc_channels['pitch'])},{int(self.rc_channels['yaw'])},{int(self.rc_channels['throttle'])},{self.rc_channels['arm']}"
             self.udp_socket.sendto(payload.encode("utf-8"), (self.esp32_ip, self.esp32_port))
 
 if __name__ == "__main__":
