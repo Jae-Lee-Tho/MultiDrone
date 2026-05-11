@@ -2,6 +2,7 @@
 import os
 import time
 import random
+import socket
 import numpy as np
 from pynput import keyboard as pynput_keyboard
 from pylsl import StreamInfo, StreamOutlet
@@ -9,12 +10,10 @@ from pylsl import StreamInfo, StreamOutlet
 # =============================================================
 #  CONFIGURATION
 # =============================================================
-# os.path.join ensures cross-platform compatibility for Windows (\) and Mac (/)
 DATA_DIR      = os.path.join("nakanishi_unfiltered_eeg", "subject_8")
 FS            = 256.0
 CHUNK_SAMPLES = int(2.0 * FS)  # 512 samples = 2 seconds
 
-# Updated to match the new frequency mapping in main_bci.py
 COMMAND_MAPPING = {
     't': '9.25hz.npy',   # TAKEOFF
     'q': '10.25hz.npy',  # STOP
@@ -26,6 +25,12 @@ COMMAND_MAPPING = {
     's': '14.25hz.npy',  # BACKWARD
     'a': '14.75hz.npy',  # LEFT
 }
+
+# Setup UDP listener for Automated Testing (test_runner.py)
+TEST_TRIGGER_PORT = 4213
+cmd_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+cmd_socket.bind(("127.0.0.1", TEST_TRIGGER_PORT))
+cmd_socket.setblocking(False)
 
 # =============================================================
 #  LOAD DATA
@@ -69,7 +74,7 @@ def load_random_snippet(key: str) -> list[list[float]]:
 SILENCE = [0.0] * 8  # flat zero sample — no signal, no noise
 
 # =============================================================
-#  KEYBOARD LISTENER (pynput — macOS & Windows friendly)
+#  KEYBOARD LISTENER
 # =============================================================
 pressed_keys: set[str] = set()
 should_exit = False
@@ -100,13 +105,14 @@ listener.start()
 # =============================================================
 print("\n[3/3] Entering main streaming loop...\n")
 print("-" * 60)
+print(f"  Listening for Keyboard OR Automated UDP (Port {TEST_TRIGGER_PORT})")
 print("  Idle → streaming zeros (no signal)")
 print("  Press keys to inject 2-second SSVEP bursts:\n")
 print("    [T]      →  TAKEOFF   (9.25 Hz)")
 print("    [Q]      →  STOP      (10.25 Hz)")
 print("    [L]      →  LAND      (11.25 Hz)")
 print("    [U]      →  UP        (13.25 Hz)")
-print("[J]      →  DOWN      (12.25 Hz)")
+print("    [J]      →  DOWN      (12.25 Hz)")
 print("    [W]      →  FORWARD   (13.75 Hz)")
 print("    [A]      →  LEFT      (14.75 Hz)")
 print("    [S]      →  BACKWARD  (14.25 Hz)")
@@ -119,25 +125,42 @@ next_sample_time = time.perf_counter()
 
 try:
     while True:
-
         if should_exit:
             print("\n[SHUTDOWN] ESC pressed.")
             break
 
-        # Inject on keypress, only when idle
-        if not injection_buffer:
-            for key, filename in COMMAND_MAPPING.items():
-                if key in pressed_keys:
-                    print(f"[INJECT]  '{key.upper()}' pressed → streaming {filename}")
-                    injection_buffer = load_random_snippet(key)
-                    time.sleep(0.20)  # debounce
-                    break
+        # 1. Check for automated UDP triggers from test_runner.py
+        auto_trigger_key = None
+        try:
+            data, _ = cmd_socket.recvfrom(1024)
+            char_cmd = data.decode('utf-8').strip().lower()
+            if char_cmd in COMMAND_MAPPING:
+                auto_trigger_key = char_cmd
+        except BlockingIOError:
+            pass
 
-        # Build sample
+        # 2. Inject on keypress OR UDP trigger, only when idle
+        if not injection_buffer:
+            trigger_key = auto_trigger_key
+
+            if not trigger_key:
+                for key in COMMAND_MAPPING.keys():
+                    if key in pressed_keys:
+                        trigger_key = key
+                        break
+
+            if trigger_key:
+                filename = COMMAND_MAPPING[trigger_key]
+                src = "AUTO-UDP" if auto_trigger_key else "KEYBOARD"
+                print(f"[INJECT - {src}] '{trigger_key.upper()}' → streaming {filename}")
+                injection_buffer = load_random_snippet(trigger_key)
+                time.sleep(0.20)  # debounce
+
+        # 3. Build sample
         if injection_buffer:
             sample = injection_buffer.pop(0)
             if not injection_buffer:
-                print("[INJECT]  Burst complete — back to silence.\n")
+                print("[INJECT] Burst complete — back to silence.\n")
         else:
             sample = SILENCE
 
@@ -154,3 +177,4 @@ except KeyboardInterrupt:
     print("\n[SHUTDOWN] Stopped.")
 finally:
     listener.stop()
+    cmd_socket.close()
