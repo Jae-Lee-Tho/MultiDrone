@@ -69,7 +69,7 @@ const uint16_t UDP_PORT = 4210;   // must match ESP32_PORT in main_bci.py
 // =============================================================================
 
 #define MSP_SET_RAW_RC   200
-#define RC_CHANNEL_COUNT 5    // roll, pitch, throttle, yaw, arm — must match Python
+#define RC_CHANNEL_COUNT 5    // roll, pitch, yaw, throttle, arm — must match Python
 
 
 // =============================================================================
@@ -87,7 +87,7 @@ const uint16_t UDP_PORT = 4210;   // must match ESP32_PORT in main_bci.py
 // =============================================================================
 
 WiFiUDP udp;
-char    udpBuffer[64];   // large enough for "1500,1500,1000,1500,1000\0"
+char    udpBuffer[64];   // large enough for "1500,1500,1500,1000,1000\0"
 
 IPAddress laptopIP;
 bool      laptopConnected = false;
@@ -307,7 +307,8 @@ void loop() {
             udpBuffer[len] = '\0';
 
             // Step 2: Parse CSV into channel values
-            uint16_t channels[RC_CHANNEL_COUNT] = {1500, 1500, 1000, 1500, 1000};
+            // Python sends: Roll, Pitch, Yaw, Throttle, Arm
+            uint16_t channels[RC_CHANNEL_COUNT] = {1500, 1500, 1500, 1000, 1000};
             char* token = strtok(udpBuffer, ",");
             for (int i = 0; i < RC_CHANNEL_COUNT && token != nullptr; i++) {
                 channels[i] = (uint16_t)atoi(token);
@@ -323,7 +324,8 @@ void loop() {
     // If we haven't received a packet from the laptop recently, disarm and cut throttle.
     if (laptopConnected && !watchdogTriggered && (now - lastUdpPacketTime > WATCHDOG_TIMEOUT_MS)) {
         Serial.println("[ESP32] WARNING: UDP timeout! Triggering RX Failsafe (Throttle 1000, Disarm).");
-        uint16_t failsafeChannels[RC_CHANNEL_COUNT] = {1500, 1500, 1000, 1500, 1000};
+        // FIXED: Order is Roll, Pitch, Yaw, Throttle, Arm
+        uint16_t failsafeChannels[RC_CHANNEL_COUNT] = {1500, 1500, 1500, 1000, 1000};
         sendMspSetRawRc(failsafeChannels, RC_CHANNEL_COUNT);
         watchdogTriggered = true;
     }
