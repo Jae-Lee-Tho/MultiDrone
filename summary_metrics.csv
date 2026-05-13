@@ -1,0 +1,5 @@
+,Trials,Accuracy (%),False Cmd Rate (%),Agreement (%),Avg Latency (s)
+BOTH,90.0,91.11,1.11,82.22,2.08
+EEG_ONLY,90.0,92.22,4.44,0.0,2.62
+VOICE_ONLY,90.0,98.89,1.11,0.0,2.16
+AVG,270.0,94.07,2.22,27.41,2.29

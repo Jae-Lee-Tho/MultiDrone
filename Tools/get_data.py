@@ -9,10 +9,11 @@ import json
 # CONFIGURATION
 # =============================================================================
 CSV_FILENAME = "experiment_results.csv"
-N_TRIALS_PER_COMMAND = 5   # ✏️ TUNE: Change to 10, 20, etc.
+N_TRIALS_PER_COMMAND = 10   # ✏️ TUNE: Change to 10, 20, etc.
 TRIAL_TIMEOUT_SEC = 5.0    # ✏️ TUNE: Wait time before giving up on a trial
 
-EXPERIMENTS = ["VOICE_ONLY", "EEG_ONLY", "BOTH"]
+# EXPERIMENTS = ["VOICE_ONLY", "EEG_ONLY", "BOTH"]
+EXPERIMENTS = ["BOTH"]
 
 COMMANDS =[
     "TAKEOFF", "LAND", "FORWARD", "BACKWARD",
